@@ -1,0 +1,99 @@
+﻿@model VehicleSearchResult
+
+@{
+    ViewData["Title"] = "Ricerca autovetture";
+}
+
+<h2>Index</h2>
+
+<form asp-action="Index" method="get" class="panel panel-primary">
+    <div class="panel-body">
+        <div class="form-group ">
+            <label for="brand">Costruttore</label>
+            <input class="form-control" placeholder="Inserisci il costruttore" type="text" name="brand"
+                   id="brand" value="@Model.BrandFilter" />
+        </div>
+        <div class="form-group ">
+            <label for="model">Modello</label>
+            <input class="form-control" placeholder="Inserisci il modello" type="text" name="model"
+                   id="model" value="@Model.ModelFilter" />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+<br />
+<div class="panel panel-primary">
+    <div class="panel-heading">Search results</div>
+    <div class="panel-body">
+        <table class="table table-striped ">
+            <thead>
+                <tr>
+                    <th>
+                        Targa
+                    </th>
+                    <th>
+                        Modello
+                    </th>
+                    <th>
+                        Costruttore
+                    </th>
+                    <th>
+                        Costo
+                    </th>
+                    <th>
+                        Stato
+                    </th>
+                    <th>
+                        Modified
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @item.Plate
+                        </td>
+                        <td>
+                            @item.Model
+                        </td>
+                        <td>
+                            @item.Brand
+                        </td>
+                        <td>
+                            @($"{item.DailyCost:###0.00}€")
+                        </td>
+                        <td>
+                            @item.State
+                        </td>
+                        <td>
+                            @Html.ActionLink("Prenota", "Index", new { plate = item.Plate }) |
+                            @Html.ActionLink("Riconsegna", "Index", new { plate = item.Plate }) |
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+
+        @{
+            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+        }
+        <nav aria-label="Page navigation">
+            <ul class="pagination nav-justified">
+                <li class="page-item @prevDisabled">
+                    @Html.ActionLink("Previous", "Index", new { pageIndex = Model.PageIndex - 1, brand = Model.BrandFilter,model=Model.ModelFilter,plate=Model.PlateFilter,state=Model.StateFilter }, new { @class = "page-link " + prevDisabled })
+                </li>
+                <li class="page-item ">
+                    <span class="page-link">@((Model.PageIndex+1) + "/" + Model.TotalPages + " (" + Model.TotalItems + " items)") </span>
+                </li>
+                <li class="page-item @nextDisabled">
+                    @Html.ActionLink("Next", "Index", new { pageIndex = Model.PageIndex + 1, brand = Model.BrandFilter, model = Model.ModelFilter, plate = Model.PlateFilter, state = Model.StateFilter }, new { @class = "page-link " + nextDisabled })
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

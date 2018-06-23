@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <RootNamespace>iRentCar.UserActor.Interfaces</RootNamespace>
+    <AssemblyName>iRentCar.UserActor.Interfaces</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.1.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.274" />
+  </ItemGroup>
+
+</Project>
