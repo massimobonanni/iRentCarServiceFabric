@@ -8,22 +8,39 @@
 
 <form asp-action="Index" method="get" class="panel panel-primary">
     <div class="panel-body">
-        <div class="form-group ">
-            <label for="brand">Costruttore</label>
-            <input class="form-control" placeholder="Inserisci il costruttore" type="text" name="brand"
-                   id="brand" value="@Model.BrandFilter" />
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="brand">Costruttore</label>
+                <input class="form-control" placeholder="Inserisci il costruttore" type="text" name="brand"
+                       id="brand" value="@Model.BrandFilter" />
+            </div>
+            <div class="form-group col-md-6">
+                <label for="model">Modello</label>
+                <input class="form-control" placeholder="Inserisci il modello" type="text" name="model"
+                       id="model" value="@Model.ModelFilter" />
+            </div>
         </div>
-        <div class="form-group ">
-            <label for="model">Modello</label>
-            <input class="form-control" placeholder="Inserisci il modello" type="text" name="model"
-                   id="model" value="@Model.ModelFilter" />
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="plate">Targa</label>
+                <input class="form-control" placeholder="Inserisci la targa" type="text" name="plate"
+                       id="plate" value="@Model.PlateFilter" />
+            </div>
+            <div class="form-group col-md-6">
+                <label for="state">Stato</label>
+                <select class="form-control" name="state" id="state">
+                    <option value="">Qualsiasi</option>
+                    <option value="Free">Disponibile</option>
+                    <option value="Busy">Prenotata</option>
+                    <option value="NotAvailable">Non utilizzabile</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
 <br />
 <div class="panel panel-primary">
-    <div class="panel-heading">Search results</div>
     <div class="panel-body">
         <table class="table table-striped ">
             <thead>
@@ -66,7 +83,18 @@
                             @($"{item.DailyCost:###0.00}€")
                         </td>
                         <td>
-                            @item.State
+                            @switch (item.State)
+                            {
+                                case iRentCar.VehiclesService.Interfaces.VehicleState.Busy:
+                                    @: Prenotata
+                                    break;
+                                case iRentCar.VehiclesService.Interfaces.VehicleState.Free:
+                                    @: Disponibile
+                                    break;
+                                case iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable:
+                                    @: Non Utilizzabile
+                                    break;
+                            }
                         </td>
                         <td>
                             @Html.ActionLink("Prenota", "Index", new { plate = item.Plate }) |
@@ -85,10 +113,10 @@
         <nav aria-label="Page navigation">
             <ul class="pagination nav-justified">
                 <li class="page-item @prevDisabled">
-                    @Html.ActionLink("Previous", "Index", new { pageIndex = Model.PageIndex - 1, brand = Model.BrandFilter,model=Model.ModelFilter,plate=Model.PlateFilter,state=Model.StateFilter }, new { @class = "page-link " + prevDisabled })
+                    @Html.ActionLink("Previous", "Index", new { pageIndex = Model.PageIndex - 1, brand = Model.BrandFilter, model = Model.ModelFilter, plate = Model.PlateFilter, state = Model.StateFilter }, new { @class = "page-link " + prevDisabled })
                 </li>
                 <li class="page-item ">
-                    <span class="page-link">@((Model.PageIndex+1) + "/" + Model.TotalPages + " (" + Model.TotalItems + " items)") </span>
+                    <span class="page-link">@((Model.PageIndex + 1) + "/" + Model.TotalPages + " (" + Model.TotalItems + " items)") </span>
                 </li>
                 <li class="page-item @nextDisabled">
                     @Html.ActionLink("Next", "Index", new { pageIndex = Model.PageIndex + 1, brand = Model.BrandFilter, model = Model.ModelFilter, plate = Model.PlateFilter, state = Model.StateFilter }, new { @class = "page-link " + nextDisabled })

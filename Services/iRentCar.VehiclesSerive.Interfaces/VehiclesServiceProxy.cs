@@ -11,12 +11,6 @@ using Microsoft.ServiceFabric.Services.Remoting.Client;
 
 namespace iRentCar.VehiclesService.Interfaces
 {
-    public interface IVehiclesServiceProxy
-    {
-        Task<IEnumerable<VehicleInfo>> SearchVehiclesAsync(string plate, string model, string brand,
-            VehicleState? state, CancellationToken cancellationToken);
-    }
-
     public sealed class VehiclesServiceProxy : IVehiclesServiceProxy
     {
         private static Uri serviceUri;

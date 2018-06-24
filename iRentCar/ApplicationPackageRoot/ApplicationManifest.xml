@@ -2,10 +2,10 @@
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="iRentCarType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="UserActorService_PartitionCount" DefaultValue="10" />
-    <Parameter Name="UserActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="UserActorService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="UserActorService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="VehiclesService_PartitionCount" DefaultValue="10" />
-    <Parameter Name="VehiclesService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="VehiclesService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="VehiclesService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="FrontEnd_InstanceCount" DefaultValue="-1" />
   </Parameters>
@@ -22,7 +22,7 @@
     <ServiceManifestRef ServiceManifestName="iRentCar.VehiclesServicePkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <DefaultServices>
-    <Service Name="UserActorService" GeneratedIdRef="b6d89225-26ca-4079-a76b-527adedb2060|Persisted">
+    <Service Name="UserActorService" GeneratedIdRef="98bc7b03-16b4-44a2-80d3-a617a9e9fb9a|Persisted">
       <StatefulService ServiceTypeName="UserActorServiceType" TargetReplicaSetSize="[UserActorService_TargetReplicaSetSize]" MinReplicaSetSize="[UserActorService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[UserActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>

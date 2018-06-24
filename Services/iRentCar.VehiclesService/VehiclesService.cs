@@ -133,6 +133,44 @@ namespace iRentCar.VehiclesService
             return resultList;
         }
 
+        public async Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(plate))
+                throw new ArgumentException(nameof(plate));
+
+            VehicleInfo vehicle = null;
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var tryVehicle = await this.vehiclesDictionary.TryGetValueAsync(tx, plate, TimeSpan.FromSeconds(5), cancellationToken);
+                if (tryVehicle.HasValue)
+                    vehicle = tryVehicle.Value;
+            }
+
+            return vehicle;
+        }
+
+        public async Task<bool> UpdateVehicleStateAsync(string plate, VehicleState newState, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(plate))
+                throw new ArgumentException(nameof(plate));
+
+            bool result = false;
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var tryVehicle = await this.vehiclesDictionary.TryGetValueAsync(tx, plate, TimeSpan.FromSeconds(5), cancellationToken);
+                if (tryVehicle.HasValue)
+                {
+                    var vehicle = tryVehicle.Value;
+                    vehicle.State = newState;
+                    await this.vehiclesDictionary.SetAsync(tx, plate, vehicle, TimeSpan.FromSeconds(5),
+                        cancellationToken);
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
         #endregion [ Interfaccia IVehiclesService ]
     }
 }
