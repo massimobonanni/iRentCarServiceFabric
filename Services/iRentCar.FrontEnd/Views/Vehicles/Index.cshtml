@@ -1,10 +1,10 @@
 ﻿@model VehicleSearchResult
 
 @{
-    ViewData["Title"] = "Ricerca autovetture";
+    ViewData["Title"] = "Ricerca autoveicoli";
 }
 
-<h2>Index</h2>
+<h2>Ricerca autoveicoli</h2>
 
 <form asp-action="Index" method="get" class="panel panel-primary">
     <div class="panel-body">
@@ -29,14 +29,14 @@
             <div class="form-group col-md-6">
                 <label for="state">Stato</label>
                 <select class="form-control" name="state" id="state">
-                    <option value="">Qualsiasi</option>
-                    <option value="Free">Disponibile</option>
-                    <option value="Busy">Prenotata</option>
-                    <option value="NotAvailable">Non utilizzabile</option>
+                    <option value="" selected="@(!Model.StateFilter.HasValue ? "selected" : "")">Qualsiasi</option>
+                    <option value="Free" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Free   ? "selected" : "")">Disponibile</option>
+                    <option value="Busy" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Busy   ? "selected" : "")">Prenotata</option>
+                    <option value="NotAvailable" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable   ? "selected" : "")">Non utilizzabile</option>
                 </select>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="submit" class="btn btn-primary">Cerca</button>
     </div>
 </form>
 <br />
@@ -71,7 +71,7 @@
                 {
                     <tr>
                         <td>
-                            @item.Plate
+                            @Html.ActionLink(item.Plate, "Index", new { plate = item.Plate }) |
                         </td>
                         <td>
                             @item.Model
@@ -97,8 +97,8 @@
                             }
                         </td>
                         <td>
-                            @Html.ActionLink("Prenota", "Index", new { plate = item.Plate }) |
-                            @Html.ActionLink("Riconsegna", "Index", new { plate = item.Plate }) |
+                            @Html.ActionLink("Prenota", "Reserve", new { plate = item.Plate }) |
+                            @Html.ActionLink("Riconsegna", "Unreserve", new { plate = item.Plate })
                         </td>
                     </tr>
                 }
