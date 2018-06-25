@@ -30,9 +30,9 @@
                 <label for="state">Stato</label>
                 <select class="form-control" name="state" id="state">
                     <option value="" selected="@(!Model.StateFilter.HasValue ? "selected" : "")">Qualsiasi</option>
-                    <option value="Free" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Free   ? "selected" : "")">Disponibile</option>
-                    <option value="Busy" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Busy   ? "selected" : "")">Prenotata</option>
-                    <option value="NotAvailable" selected="@(Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable   ? "selected" : "")">Non utilizzabile</option>
+                    <option value="Free" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Free ? "selected" : "")">Disponibile</option>
+                    <option value="Busy" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Busy ? "selected" : "")">Prenotata</option>
+                    <option value="NotAvailable" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable ? "selected" : "")">Non utilizzabile</option>
                 </select>
             </div>
         </div>
