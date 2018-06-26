@@ -8,5 +8,7 @@ namespace iRentCar.VehiclesService.Interfaces
     {
         Task<IEnumerable<VehicleInfo>> SearchVehiclesAsync(string plate, string model, string brand,
             VehicleState? state, CancellationToken cancellationToken);
+
+        Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken);
     }
 }

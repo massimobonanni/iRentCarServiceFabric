@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <UpdateServiceFabricManifestEnabled>True</UpdateServiceFabricManifestEnabled>
+    <ServicePackagePath>PackageRoot</ServicePackagePath>
+    <ServicePackagePrefix>$(MSBuildProjectName)</ServicePackagePrefix>
+    <FabActUtilWorkingDir>$(BaseIntermediateOutputPath)\FabActUtilTemp</FabActUtilWorkingDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.283" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
+    <ProjectReference Include="..\..\Services\iRentCar.VehiclesSerive.Interfaces\iRentCar.VehiclesService.Interfaces.csproj" />
+    <ProjectReference Include="..\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
+    <ProjectReference Include="..\iRentCar.VehicleActor.Interfaces\iRentCar.VehicleActor.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>

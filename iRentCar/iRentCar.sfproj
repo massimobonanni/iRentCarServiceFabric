@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Actors\iRentCar.UserActor\iRentCar.UserActor.csproj" />
+    <ProjectReference Include="..\Actors\iRentCar.VehicleActor\iRentCar.VehicleActor.csproj" />
     <ProjectReference Include="..\Services\iRentCar.FrontEnd\iRentCar.FrontEnd.csproj" />
     <ProjectReference Include="..\Services\iRentCar.VehiclesService\iRentCar.VehiclesService.csproj" />
   </ItemGroup>

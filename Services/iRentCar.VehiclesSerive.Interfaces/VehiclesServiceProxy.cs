@@ -73,10 +73,33 @@ namespace iRentCar.VehiclesService.Interfaces
             }
             catch (Exception ex)
             {
-                var a = 1;
+                throw;
             }
 
             var result = taskList.SelectMany(t => t.Result).ToList();
+            return result;
+        }
+
+        public async Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken)
+        {
+            await EnsurePartitionCount();
+            var taskList = new List<Task<VehicleInfo>>();
+            try
+            {
+                foreach (var partition in partitionInfoList)
+                {
+                    var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
+                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                    taskList.Add(proxy.GetVehicleByPlateAsync(plate, cancellationToken));
+                }
+                await Task.WhenAll(taskList);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            var result = taskList.Select(t => t.Result).FirstOrDefault();
             return result;
         }
     }

@@ -26,13 +26,19 @@
                 <input class="form-control" placeholder="Inserisci la targa" type="text" name="plate"
                        id="plate" value="@Model.PlateFilter" />
             </div>
+            @{
+                var allStateSelected = !Model.StateFilter.HasValue ? "selected" : "";
+                var freeSelected = Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Free ? "selected" : "";
+                var busySelected = Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Busy ? "selected" : "";
+                var notAvailableSelected = Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable ? "selected" : "";
+            }
             <div class="form-group col-md-6">
                 <label for="state">Stato</label>
                 <select class="form-control" name="state" id="state">
-                    <option value="" selected="@(!Model.StateFilter.HasValue ? "selected" : "")">Qualsiasi</option>
-                    <option value="Free" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Free ? "selected" : "")">Disponibile</option>
-                    <option value="Busy" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.Busy ? "selected" : "")">Prenotata</option>
-                    <option value="NotAvailable" selected="@(Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable ? "selected" : "")">Non utilizzabile</option>
+                    <option value="" @(allStateSelected)>Qualsiasi</option>
+                    <option value="Free" @freeSelected>Disponibile</option>
+                    <option value="Busy" @busySelected>Prenotata</option>
+                    <option value="NotAvailable" @notAvailableSelected>Non utilizzabile</option>
                 </select>
             </div>
         </div>

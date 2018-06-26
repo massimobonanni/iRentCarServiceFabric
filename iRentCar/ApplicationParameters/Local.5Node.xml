@@ -3,5 +3,6 @@
   <Parameters>
     <Parameter Name="UserActorService_PartitionCount" Value="5" />
     <Parameter Name="VehiclesService_PartitionCount" Value="5" />
+    <Parameter Name="VehicleActorService_PartitionCount" Value="1" />
   </Parameters>
 </Application>
