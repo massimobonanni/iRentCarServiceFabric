@@ -24,6 +24,7 @@ namespace iRentCar.VehicleActor
     ///  - None: State is kept in memory only and not replicated.
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
+    [ActorService(Name = "VehicleActor")]
     internal class VehicleActor : Core.Implementations.ActorBase, IVehicleActor
     {
         /// <summary>
