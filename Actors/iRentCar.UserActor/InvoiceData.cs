@@ -9,13 +9,13 @@ namespace iRentCar.UserActor
         [DataMember]
         public string Number { get; set; }
         [DataMember]
-        public Decimal Amount { get; set; }
+        public decimal Amount { get; set; }
         [DataMember]
         public DateTime ReleaseDate { get; set; }
         [DataMember]
         public InvoiceState State { get; set; }
         [DataMember]
-        public DateTime PaymentDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
 
 
     }

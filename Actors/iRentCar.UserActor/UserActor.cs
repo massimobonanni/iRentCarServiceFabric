@@ -43,28 +43,74 @@ namespace iRentCar.UserActor
         /// This method is called whenever an actor is activated.
         /// An actor is activated the first time any of its methods are invoked.
         /// </summary>
-        protected override Task OnActivateAsync()
+        protected override async Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
+            var userData = await GetUserDataFromStateAsync();
 
+            if (userData == null)
+            {
+                var user = await this.userRepository.GetUserByUsernameAsync(this.Id.ToString(), default(CancellationToken));
+                if (user != null)
+                {
+                    userData = new UserData()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        IsEnabled = user.IsEnabled
+                    };
+                    await SetUserDataIntoStateAsync(userData);
+                }
+            }
 
-            return Task.CompletedTask;
         }
 
-        private const string CurrentRentedCarKeyName = "CurrentRentedCar";
-        private const string InvoikeKeyNamePrefix = "Invoice_";
-        private const string UserDataKeyName = "UserInfo";
+    private const string CurrentRentedCarKeyName = "CurrentRentedCar";
+    private const string InvoikeKeyNamePrefix = "Invoice_";
+        private const string UserDataKeyName = "UserData";
 
+        #region [ StateManager accessor ]
+        private async Task<UserData> GetUserDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var infoData = await this.StateManager.TryGetStateAsync<UserData>(UserDataKeyName, cancellationToken);
+            return infoData.HasValue ? infoData.Value : null;
+        }
+        private Task SetUserDataIntoStateAsync(UserData info, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.StateManager.SetStateAsync<UserData>(UserDataKeyName, info, cancellationToken);
+        }
+
+        private async Task<RentData> GetRentDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var data = await this.StateManager.TryGetStateAsync<RentData>(CurrentRentedCarKeyName, cancellationToken);
+            return data.HasValue ? data.Value : null;
+        }
+        private Task SetRentDataIntoStateAsync(RentData data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.StateManager.SetStateAsync<RentData>(CurrentRentedCarKeyName, data, cancellationToken);
+        }
+        #endregion [ StateManager accessor ]
+
+        private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var userData = await GetUserDataFromStateAsync(default(CancellationToken));
+
+            return userData != null;
+        }
 
         public async Task<UserActorError> RentVehicleAsync(RentInfo rentInfo, CancellationToken cancellationToken)
         {
             if (rentInfo == null)
                 throw new ArgumentNullException(nameof(rentInfo));
 
+            if (!await IsValidInternalAsync(cancellationToken))
+                return UserActorError.UserNotValid;
+
             UserActorError result = UserActorError.Ok;
 
-            var currentRentVehicle = await GetCurrentRentVehicleAsync(cancellationToken);
+            var currentRentVehicle = await GetRentDataFromStateAsync(cancellationToken);
 
             if (currentRentVehicle == null)
             {
@@ -75,7 +121,7 @@ namespace iRentCar.UserActor
                     VehiclePlate = rentInfo.Plate,
                     State = RentState.Active
                 };
-                await SetCurrentRentVehicleAsync(currentRentVehicle, cancellationToken);
+                await SetRentDataIntoStateAsync(currentRentVehicle, cancellationToken);
             }
             else
             {
@@ -86,9 +132,38 @@ namespace iRentCar.UserActor
 
         }
 
-        public Task<UserActorError> ReleaseVehicleAsync(CancellationToken cancellationToken)
+        public async Task<UserActorError> ReleaseVehicleAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (!await IsValidInternalAsync(cancellationToken))
+                return UserActorError.UserNotValid;
+
+            UserActorError result = UserActorError.Ok;
+
+            var currentRentVehicle = await GetRentDataFromStateAsync(cancellationToken);
+
+            if (currentRentVehicle != null)
+            {
+                // Interazione con la fattura
+                currentRentVehicle.EndRent = DateTime.Now;
+                var amount = currentRentVehicle.CalculateCost();
+
+                var invoice = new InvoiceData()
+                {
+                    Amount = amount.Value,
+                    Number = DateTime.Now.Ticks.ToString(),
+                    ReleaseDate = DateTime.Now,
+                    State = InvoiceState.NotPaid
+                };
+
+
+                await SetCurrentRentVehicleAsync(currentRentVehicle, cancellationToken);
+            }
+            else
+            {
+                result = UserActorError.VehicleNotRented;
+            }
+
+            return result;
         }
 
         public Task<bool> IsValidAsync(CancellationToken cancellationToken)
@@ -101,21 +176,6 @@ namespace iRentCar.UserActor
             throw new NotImplementedException();
         }
 
-        #region [ Interazione con lo stato ]
 
-        private async Task<RentData> GetCurrentRentVehicleAsync(CancellationToken cancellationToken)
-        {
-            var rentData =
-                await this.StateManager.TryGetStateAsync<RentData>(CurrentRentedCarKeyName, cancellationToken);
-
-            return rentData.HasValue ? rentData.Value : null;
-        }
-
-        private async Task SetCurrentRentVehicleAsync(RentData currentRentVehicle, CancellationToken cancellationToken)
-        {
-            await this.StateManager.SetStateAsync(CurrentRentedCarKeyName, currentRentVehicle, cancellationToken);
-
-        }
-        #endregion [ Interazione con lo stato ]
     }
 }

@@ -9,7 +9,7 @@ namespace iRentCar.UserActor
         [DataMember]
         public string VehiclePlate { get; set; }
         [DataMember]
-        public Decimal VehicleDailyCost { get; set; }
+        public decimal VehicleDailyCost { get; set; }
         [DataMember]
         public string InvoiceNumber { get; set; }
         [DataMember]
@@ -18,6 +18,17 @@ namespace iRentCar.UserActor
         public DateTime StartRent { get; set; }
         [DataMember]
         public DateTime? EndRent { get; set; }
+
+
+        public decimal? CalculateCost()
+        {
+            if (!EndRent.HasValue)
+                return null;
+
+            var dayDuration = (int)Math.Floor((EndRent.Value - StartRent).TotalDays + 1);
+
+            return dayDuration * VehicleDailyCost;
+        }
 
 
     }

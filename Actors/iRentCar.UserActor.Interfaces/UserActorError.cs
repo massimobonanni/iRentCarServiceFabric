@@ -8,9 +8,13 @@ namespace iRentCar.UserActor.Interfaces
         [EnumMember]
         Ok = 0,
         [EnumMember]
-        VehicleAlreadyRented = 1,
+        UserNotValid = 2,
+        [EnumMember]
+        VehicleAlreadyRented = 10,
+        [EnumMember]
+        VehicleNotRented = 11,
         [EnumMember]
         InternalActorError = 999
 
-    }
+           }
 }
