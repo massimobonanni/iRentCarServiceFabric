@@ -35,10 +35,10 @@
             <div class="form-group col-md-6">
                 <label for="state">Stato</label>
                 <select class="form-control" name="state" id="state">
-                    <option value="" @(allStateSelected)>Qualsiasi</option>
-                    <option value="Free" @freeSelected>Disponibile</option>
-                    <option value="Busy" @busySelected>Prenotata</option>
-                    <option value="NotAvailable" @notAvailableSelected>Non utilizzabile</option>
+                    <option value="">Qualsiasi</option>
+                    <option value="Free">Disponibile</option>
+                    <option value="Busy">Prenotata</option>
+                    <option value="NotAvailable">Non utilizzabile</option>
                 </select>
             </div>
         </div>
@@ -77,7 +77,7 @@
                 {
                     <tr>
                         <td>
-                            @Html.ActionLink(item.Plate, "Index", new { plate = item.Plate }) |
+                            @Html.ActionLink(item.Plate, "Details", new { plate = item.Plate })
                         </td>
                         <td>
                             @item.Model

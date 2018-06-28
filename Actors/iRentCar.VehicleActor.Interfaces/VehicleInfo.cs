@@ -17,5 +17,10 @@ namespace iRentCar.VehicleActor.Interfaces
         [DataMember]
         public RentInfo CurrentRent { get; set; }
 
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(Model) && !string.IsNullOrWhiteSpace(Brand);
+        }
+
     }
 }

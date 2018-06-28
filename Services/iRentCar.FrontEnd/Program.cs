@@ -20,7 +20,7 @@ namespace iRentCar.FrontEnd
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("iRentCar.FrontEndType",
+                ServiceRuntime.RegisterServiceAsync("FrontEndType",
                     context => new FrontEnd(context)).GetAwaiter().GetResult();
 
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(FrontEnd).Name);

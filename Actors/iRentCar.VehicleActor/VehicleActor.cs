@@ -10,8 +10,11 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Actors.Client;
 using iRentCar.VehicleActor.Interfaces;
 using iRentCar.VehiclesService.Interfaces;
-using VehicleInfo = iRentCar.VehicleActor.Interfaces.VehicleInfo;
 using VehicleActorInterface = iRentCar.VehicleActor.Interfaces;
+using iRentCar.UserActor.Interfaces;
+using iRentCar.Core;
+using UserActorInterfaces = iRentCar.UserActor.Interfaces;
+
 
 namespace iRentCar.VehicleActor
 {
@@ -27,13 +30,8 @@ namespace iRentCar.VehicleActor
     [ActorService(Name = "VehicleActor")]
     internal class VehicleActor : Core.Implementations.ActorBase, IVehicleActor
     {
-        /// <summary>
-        /// Initializes a new instance of VehicleActor
-        /// </summary>
-        /// <param name="actorService">The Microsoft.ServiceFabric.Actors.Runtime.ActorService that will host this actor instance.</param>
-        /// <param name="actorId">The Microsoft.ServiceFabric.Actors.ActorId for this actor instance.</param>
-        public VehicleActor(ActorService actorService, ActorId actorId, IVehiclesServiceProxy vehiclesServiceProxy)
-            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), vehiclesServiceProxy)
+        public VehicleActor(ActorService actorService, ActorId actorId)
+            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new VehiclesServiceProxy())
         {
 
         }
@@ -102,31 +100,99 @@ namespace iRentCar.VehicleActor
             return this.StateManager.SetStateAsync<VehicleActorInterface.VehicleState>(StateKeyName, state, cancellationToken);
         }
 
-        private async Task<RentInfo> GetCurrentRentInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<VehicleActorInterface.RentInfo> GetCurrentRentInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var infoData = await this.StateManager.TryGetStateAsync<RentInfo>(CurrentRentInfoKeyName, cancellationToken);
+            var infoData = await this.StateManager.TryGetStateAsync<VehicleActorInterface.RentInfo>(CurrentRentInfoKeyName, cancellationToken);
             return infoData.HasValue ? infoData.Value : null;
         }
-        private Task SetCurrentRentInfoIntoStateAsync(RentInfo info, CancellationToken cancellationToken = default(CancellationToken))
+        private Task SetCurrentRentInfoIntoStateAsync(VehicleActorInterface.RentInfo info, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.StateManager.SetStateAsync<RentInfo>(CurrentRentInfoKeyName, info, cancellationToken);
+            return this.StateManager.SetStateAsync<VehicleActorInterface.RentInfo>(CurrentRentInfoKeyName, info, cancellationToken);
         }
         #endregion [ StateManager accessor ]
 
         #region [ IVehicleActor interface ]
-        public Task<bool> ReserveAsync(string user, DateTime startReservation, DateTime endReservation, CancellationToken cancellationToken)
+        public async Task<bool> ReserveAsync(string user, DateTime startReservation, DateTime endReservation, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(user))
+                throw new ArgumentException(nameof(user));
+
+            if (startReservation >= endReservation)
+                return false;
+
+            var currentState = await GetVehicleStateFromStateAsync(cancellationToken);
+
+            if (currentState != VehicleActorInterface.VehicleState.Free)
+                return false;
+
+            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+
+            var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
+                UriConstants.UserActorUri);
+
+            var response = await actorProxy.RentVehicleAsync(new UserActorInterfaces.RentInfo()
+            {
+                DailyCost = info.DailyCost,
+                Plate = this.Id.ToString()
+            }, cancellationToken);
+
+            if (response != UserActorError.Ok)
+                return false;
+
+            VehicleActorInterface.RentInfo rentInfo = new VehicleActorInterface.RentInfo() { User = user, StartDate = startReservation, EndDate = endReservation };
+            await this.SetCurrentRentInfoIntoStateAsync(rentInfo, cancellationToken);
+            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Busy);
+            var result = await this.vehiclesServiceProxy.UpdateVehicleStateAsync(this.Id.ToString(),
+                VehiclesService.Interfaces.VehicleState.Busy, cancellationToken);
+
+            return true;
         }
 
-        public Task<bool> UnreserveAsync(CancellationToken cancellationToken)
+        public async Task<bool> UnreserveAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var currentState = await GetVehicleStateFromStateAsync(cancellationToken);
+            if (currentState != VehicleActorInterface.VehicleState.Busy)
+                return false;
+
+            var currentRentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
+            if (currentRentInfo == null)
+                return false;
+
+            var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(currentRentInfo.User),
+                UriConstants.UserActorUri);
+
+            var response = await actorProxy.ReleaseVehicleAsync(cancellationToken);
+
+            if (response != UserActorError.Ok)
+                return false;
+
+            await this.SetCurrentRentInfoIntoStateAsync(null, cancellationToken);
+            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Free);
+            var result = await this.vehiclesServiceProxy.UpdateVehicleStateAsync(this.Id.ToString(),
+                VehiclesService.Interfaces.VehicleState.Free, cancellationToken);
+
+            return true;
         }
 
-        public Task<VehicleActorInterface.VehicleInfo> GetInfoAsync(CancellationToken cancellationToken)
+        public async Task<VehicleActorInterface.VehicleInfo> GetInfoAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+                var state = await GetVehicleStateFromStateAsync(cancellationToken);
+                var rentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
+
+                var response = info.ToInterfacesInfo();
+                response.State = state;
+                response.CurrentRent = rentInfo;
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
         #endregion [ IVehicleActor interface ]
     }

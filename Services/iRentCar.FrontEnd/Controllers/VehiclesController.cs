@@ -3,27 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreInterfaces = iRentCar.Core.Interfaces;
 using iRentCar.FrontEnd.Models;
-using iRentCar.VehiclesService.Interfaces;
+using VehiclesServiceInterfaces = iRentCar.VehiclesService.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using iRentCar.VehicleActor.Interfaces;
+using Microsoft.ServiceFabric.Actors;
+using iRentCar.Core;
 
 namespace iRentCar.FrontEnd.Controllers
 {
     public class VehiclesController : Controller
     {
-        public VehiclesController(IVehiclesServiceProxy vehiclesServiceProxy)
+        public VehiclesController(VehiclesServiceInterfaces.IVehiclesServiceProxy vehiclesServiceProxy, CoreInterfaces.IActorFactory actorFactory)
         {
             if (vehiclesServiceProxy == null)
                 throw new ArgumentNullException(nameof(vehiclesServiceProxy));
+            if (actorFactory == null)
+                throw new ArgumentNullException(nameof(actorFactory));
 
             this.vehiclesServiceProxy = vehiclesServiceProxy;
+            this.actorFactory = actorFactory;
         }
 
-        private readonly IVehiclesServiceProxy vehiclesServiceProxy;
+        private readonly VehiclesServiceInterfaces.IVehiclesServiceProxy vehiclesServiceProxy;
+        private readonly CoreInterfaces.IActorFactory actorFactory;
 
         // GET: Vehicles
-        public async Task<ActionResult> Index(string brand, string model, string plate, VehicleState? state, int pageIndex = 0, int pageSize = 10)
+        public async Task<ActionResult> Index(string brand, string model, string plate, VehiclesServiceInterfaces.VehicleState? state, int pageIndex = 0, int pageSize = 10)
         {
             var vehicles =
                 await this.vehiclesServiceProxy.SearchVehiclesAsync(plate, model, brand, state, default(CancellationToken));
@@ -46,9 +54,17 @@ namespace iRentCar.FrontEnd.Controllers
         }
 
         // GET: Vehicles/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(string plate)
         {
-            return View();
+            var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
+                new Uri(UriConstants.VehicleActorUri));
+
+            var vehicleInfo = await actorProxy.GetInfoAsync(default(CancellationToken));
+
+            if (vehicleInfo == null || !vehicleInfo.IsValid())
+                return NotFound();
+
+            return View(vehicleInfo);
         }
 
         // GET: Vehicles/Create

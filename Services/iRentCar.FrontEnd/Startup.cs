@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using iRentCar.Core.Implementations;
+using iRentCar.Core.Interfaces;
 using iRentCar.VehiclesService.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +27,7 @@ namespace iRentCar.FrontEnd
             services.AddMvc();
 
             services.AddTransient<IVehiclesServiceProxy, VehiclesServiceProxy>();
+            services.AddSingleton<IActorFactory, ReliableFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

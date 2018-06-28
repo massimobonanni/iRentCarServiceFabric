@@ -18,9 +18,7 @@ namespace iRentCar.UserActor
                 // are automatically populated when you build this project.
                 // For more information, see https://aka.ms/servicefabricactorsplatform
 
-                var userRepository = new InMemoryUserRepository();
-
-                ActorRuntime.RegisterActorAsync<UserActor> (
+                ActorRuntime.RegisterActorAsync<UserActor>(
                    (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
 
                 Thread.Sleep(Timeout.Infinite);

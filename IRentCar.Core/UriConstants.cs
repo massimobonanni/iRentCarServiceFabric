@@ -6,8 +6,8 @@ namespace iRentCar.Core
 {
     public static class UriConstants
     {
-        public const string UserActorUri = "fabric:/iCarRent/UserActor";
-        public const string VehiclesServiceUri = "fabric:/iCarRent/VehiclesService";
-        public const string VehicleActorUri = "fabric:/iCarRent/VehicleActor";
+        public const string UserActorUri = "fabric:/iRentCar/UserActor";
+        public const string VehiclesServiceUri = "fabric:/iRentCar/VehiclesService";
+        public const string VehicleActorUri = "fabric:/iRentCar/VehicleActor";
     }
 }

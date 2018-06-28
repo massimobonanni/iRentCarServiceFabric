@@ -29,12 +29,12 @@
   </ServiceManifestImport>
   <DefaultServices>
     <Service Name="VehiclesService">
-      <StatefulService ServiceTypeName="iRentCar.VehiclesServiceType" TargetReplicaSetSize="[VehiclesService_TargetReplicaSetSize]" MinReplicaSetSize="[VehiclesService_MinReplicaSetSize]">
+      <StatefulService ServiceTypeName="VehiclesServiceType" TargetReplicaSetSize="[VehiclesService_TargetReplicaSetSize]" MinReplicaSetSize="[VehiclesService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[VehiclesService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
     <Service Name="FrontEndService">
-      <StatelessService ServiceTypeName="iRentCar.FrontEndType" InstanceCount="[FrontEnd_InstanceCount]">
+      <StatelessService ServiceTypeName="FrontEndType" InstanceCount="[FrontEnd_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>

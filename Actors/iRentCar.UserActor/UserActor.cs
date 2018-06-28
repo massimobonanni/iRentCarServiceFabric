@@ -21,13 +21,8 @@ namespace iRentCar.UserActor
     [ActorService(Name = "UserActor")]
     internal class UserActor : Core.Implementations.ActorBase, IUserActor
     {
-        /// <summary>
-        /// Initializes a new instance of UserActor
-        /// </summary>
-        /// <param name="actorService">The Microsoft.ServiceFabric.Actors.Runtime.ActorService that will host this actor instance.</param>
-        /// <param name="actorId">The Microsoft.ServiceFabric.Actors.ActorId for this actor instance.</param>
-        public UserActor(ActorService actorService, ActorId actorId, IUsersRepository userRepository)
-            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), userRepository)
+        public UserActor(ActorService actorService, ActorId actorId)
+            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository())
         {
 
         }

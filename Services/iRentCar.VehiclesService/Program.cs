@@ -22,7 +22,7 @@ namespace iRentCar.VehiclesService
 
                 var vehiclesRepository = new FakeVehiclesRepository();
 
-                ServiceRuntime.RegisterServiceAsync("iRentCar.VehiclesServiceType",
+                ServiceRuntime.RegisterServiceAsync("VehiclesServiceType",
                     context => new VehiclesService(context, vehiclesRepository)).GetAwaiter().GetResult();
 
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(VehiclesService).Name);
