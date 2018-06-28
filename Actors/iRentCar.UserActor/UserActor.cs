@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using iRentCar.Core.Implementations;
@@ -67,8 +69,9 @@ namespace iRentCar.UserActor
 
         }
 
-    private const string CurrentRentedCarKeyName = "CurrentRentedCar";
-    private const string InvoikeKeyNamePrefix = "Invoice_";
+        private const string CurrentRentedCarKeyName = "CurrentRentedCar";
+        private const string InvoikeKeyNamePrefix = "Invoice_";
+        private const string CurrentInvoikeKeyName = "CurrentInvoice";
         private const string UserDataKeyName = "UserData";
 
         #region [ StateManager accessor ]
@@ -91,6 +94,38 @@ namespace iRentCar.UserActor
         {
             return this.StateManager.SetStateAsync<RentData>(CurrentRentedCarKeyName, data, cancellationToken);
         }
+
+        private async Task<InvoiceData> GetInvoiceDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var data = await this.StateManager.TryGetStateAsync<InvoiceData>(CurrentInvoikeKeyName, cancellationToken);
+            return data.HasValue ? data.Value : null;
+        }
+        private Task SetInvoiceDataIntoStateAsync(InvoiceData data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.StateManager.SetStateAsync<InvoiceData>(CurrentInvoikeKeyName, data, cancellationToken);
+        }
+
+        private string GenerateInvoice(string invoiceNumber)
+        {
+            if (string.IsNullOrWhiteSpace(invoiceNumber))
+                throw new ArgumentException(nameof(invoiceNumber));
+
+            return $"{InvoikeKeyNamePrefix}{invoiceNumber}";
+        }
+
+        private async Task<IEnumerable<string>> GetInvoiceKeysAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return (await this.StateManager.GetStateNamesAsync(cancellationToken)).Where(k => k.StartsWith(InvoikeKeyNamePrefix));
+        }
+
+        private async Task AddOrUpdateInvoiceIntoStateAsync(InvoiceData data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+            var invoiceKey = GenerateInvoice(data.Number);
+            await this.StateManager.SetStateAsync<InvoiceData>(invoiceKey, data, cancellationToken);
+        }
+
         #endregion [ StateManager accessor ]
 
         private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -116,10 +151,9 @@ namespace iRentCar.UserActor
             {
                 currentRentVehicle = new RentData()
                 {
-                    StartRent = DateTime.Now,
+                    StartRent = rentInfo.StartRent,
                     VehicleDailyCost = rentInfo.DailyCost,
-                    VehiclePlate = rentInfo.Plate,
-                    State = RentState.Active
+                    VehiclePlate = rentInfo.Plate
                 };
                 await SetRentDataIntoStateAsync(currentRentVehicle, cancellationToken);
             }
@@ -143,7 +177,7 @@ namespace iRentCar.UserActor
 
             if (currentRentVehicle != null)
             {
-                // Interazione con la fattura
+                // TODO: Interazione con la fattura
                 currentRentVehicle.EndRent = DateTime.Now;
                 var amount = currentRentVehicle.CalculateCost();
 
@@ -155,8 +189,8 @@ namespace iRentCar.UserActor
                     State = InvoiceState.NotPaid
                 };
 
-
-                await SetCurrentRentVehicleAsync(currentRentVehicle, cancellationToken);
+                await SetInvoiceDataIntoStateAsync(invoice, cancellationToken);
+                await SetRentDataIntoStateAsync(null, cancellationToken);
             }
             else
             {
@@ -168,14 +202,45 @@ namespace iRentCar.UserActor
 
         public Task<bool> IsValidAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return this.IsValidInternalAsync(cancellationToken);
         }
 
-        public Task<InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken)
+        public async Task<InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var invoice = await GetActiveInvoiceAsync(cancellationToken);
+            return invoice;
         }
 
+        public async Task<Interfaces.UserInfo> GetInfoAsync(CancellationToken cancellationToken)
+        {
+            if (!await IsValidInternalAsync(cancellationToken))
+                return null;
 
+            var userInfo = (await this.GetUserDataFromStateAsync(cancellationToken)).ToUserInfo();
+
+            var rentData = await this.GetRentDataFromStateAsync(cancellationToken);
+            if (rentData != null)
+            {
+                userInfo.CurrentRent = rentData.ToRentInfo();
+            }
+
+            var currentInvoice = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+            if (currentInvoice != null)
+            {
+                userInfo.Invoices.Add(currentInvoice.ToInvoiceInfo());
+            }
+
+            var invoiceKeys = await this.GetInvoiceKeysAsync(cancellationToken);
+            if (invoiceKeys != null && invoiceKeys.Any())
+            {
+                foreach (var key in invoiceKeys)
+                {
+                    var invoice = await this.StateManager.GetStateAsync<InvoiceData>(key, cancellationToken);
+                    userInfo.Invoices.Add(invoice.ToInvoiceInfo());
+                }
+            }
+
+            return userInfo;
+        }
     }
 }

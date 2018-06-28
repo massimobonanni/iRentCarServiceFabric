@@ -11,10 +11,6 @@ namespace iRentCar.UserActor
         [DataMember]
         public decimal VehicleDailyCost { get; set; }
         [DataMember]
-        public string InvoiceNumber { get; set; }
-        [DataMember]
-        public RentState State { get; set; }
-        [DataMember]
         public DateTime StartRent { get; set; }
         [DataMember]
         public DateTime? EndRent { get; set; }

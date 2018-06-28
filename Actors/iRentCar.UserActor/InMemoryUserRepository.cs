@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using iRentCar.Core.Interfaces;
+using CoreInterfaces=iRentCar.Core.Interfaces;
 using iRentCar.UserActor.Interfaces;
 
 namespace iRentCar.UserActor
 {
-    internal class InMemoryUserRepository : IUsersRepository
+    internal class InMemoryUserRepository : CoreInterfaces.IUsersRepository
     {
-        private static IDictionary<string, UserInfo> users = new Dictionary<string, UserInfo>
+        private static IDictionary<string, CoreInterfaces.UserInfo> users = new Dictionary<string, CoreInterfaces.UserInfo>
         {
             {
                 "massimo.bonanni",
-                new UserInfo()
+                new CoreInterfaces.UserInfo()
                 {
                     Email = "mabonann@microsoft.com",
                     FirstName = "Massimo",
@@ -22,9 +22,9 @@ namespace iRentCar.UserActor
             }
         };
         
-        public Task<UserInfo> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
+        public Task<CoreInterfaces.UserInfo> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
         {
-            UserInfo user = null;
+            CoreInterfaces.UserInfo user = null;
             if (users.ContainsKey(username))
                 user = users[username];
             return Task.FromResult(user);

@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace iRentCar.UserActor.Interfaces
 {
@@ -8,8 +9,9 @@ namespace iRentCar.UserActor.Interfaces
         [DataMember]
         public string Plate { get; set; }
         [DataMember]
-        public decimal DailyCost { get; set; }  
-
-
+        public decimal DailyCost { get; set; }
+        [DataMember]
+        public DateTime StartRent { get; set; } = DateTime.Now;
     }
+
 }

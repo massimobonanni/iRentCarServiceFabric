@@ -10,10 +10,10 @@ namespace iRentCar.UserActor.Interfaces
 
     public interface IUserActor : IActor
     {
-
         Task<UserActorError> RentVehicleAsync(RentInfo rentInfo, CancellationToken cancellationToken);
         Task<UserActorError> ReleaseVehicleAsync(CancellationToken cancellationToken);
         Task<bool> IsValidAsync(CancellationToken cancellationToken);
         Task<InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken);
+        Task<UserInfo> GetInfoAsync(CancellationToken cancellationToken);
     }
 }
