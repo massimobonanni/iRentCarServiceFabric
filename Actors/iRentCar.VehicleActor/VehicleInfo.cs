@@ -6,7 +6,7 @@ using VehicleActorInterfaces = iRentCar.VehicleActor.Interfaces;
 namespace iRentCar.VehicleActor
 {
     [DataContract]
-    internal class VehicleInfo
+    internal class VehicleData
     {
         [DataMember]
         public string Model { get; set; }
@@ -25,11 +25,11 @@ namespace iRentCar.VehicleActor
             };
         }
 
-        public static VehicleInfo FromServiceInterfacesInfo(VehiclesServiceInterfaces.VehicleInfo vehicleInfo)
+        public static VehicleData FromServiceInterfacesInfo(VehiclesServiceInterfaces.VehicleInfo vehicleInfo)
         {
             if (vehicleInfo == null)
                 throw new ArgumentNullException(nameof(vehicleInfo));
-            return new VehicleInfo()
+            return new VehicleData()
             {
                 Brand = vehicleInfo.Brand,
                 DailyCost = vehicleInfo.DailyCost,
@@ -37,11 +37,11 @@ namespace iRentCar.VehicleActor
             };
         }
 
-        public static VehicleInfo FromActorInterfacesInfo(VehicleActorInterfaces.VehicleInfo vehicleInfo)
+        public static VehicleData FromActorInterfacesInfo(VehicleActorInterfaces.VehicleInfo vehicleInfo)
         {
             if (vehicleInfo == null)
                 throw new ArgumentNullException(nameof(vehicleInfo));
-            return new VehicleInfo()
+            return new VehicleData()
             {
                 Brand = vehicleInfo.Brand,
                 DailyCost = vehicleInfo.DailyCost,

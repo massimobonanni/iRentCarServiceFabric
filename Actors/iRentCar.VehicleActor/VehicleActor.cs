@@ -67,11 +67,11 @@ namespace iRentCar.VehicleActor
                 var info = await this.vehiclesServiceProxy.GetVehicleByPlateAsync(this.Id.GetStringId(),
                     default(CancellationToken));
 
-                VehicleInfo vehicleInfo = null;
+                VehicleData vehicleInfo = null;
                 VehicleActorInterface.VehicleState vehicleState = VehicleActorInterface.VehicleState.NotAvailable;
                 if (info != null)
                 {
-                    vehicleInfo = VehicleInfo.FromServiceInterfacesInfo(info);
+                    vehicleInfo = VehicleData.FromServiceInterfacesInfo(info);
                     vehicleState = info.State.ToActorInterfaceState();
                 }
                 await SetVehicleInfoIntoStateAsync(vehicleInfo);
@@ -80,14 +80,14 @@ namespace iRentCar.VehicleActor
         }
 
         #region [ StateManager accessor ]
-        private async Task<VehicleInfo> GetVehicleInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<VehicleData> GetVehicleInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var infoData = await this.StateManager.TryGetStateAsync<VehicleInfo>(InfoKeyName, cancellationToken);
+            var infoData = await this.StateManager.TryGetStateAsync<VehicleData>(InfoKeyName, cancellationToken);
             return infoData.HasValue ? infoData.Value : null;
         }
-        private Task SetVehicleInfoIntoStateAsync(VehicleInfo info, CancellationToken cancellationToken = default(CancellationToken))
+        private Task SetVehicleInfoIntoStateAsync(VehicleData info, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.StateManager.SetStateAsync<VehicleInfo>(InfoKeyName, info, cancellationToken);
+            return this.StateManager.SetStateAsync<VehicleData>(InfoKeyName, info, cancellationToken);
         }
 
         private async Task<VehicleActorInterface.VehicleState> GetVehicleStateFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
