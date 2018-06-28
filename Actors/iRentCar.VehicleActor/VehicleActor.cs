@@ -31,7 +31,7 @@ namespace iRentCar.VehicleActor
     internal class VehicleActor : Core.Implementations.ActorBase, IVehicleActor
     {
         public VehicleActor(ActorService actorService, ActorId actorId)
-            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new VehiclesServiceProxy())
+            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), null)
         {
 
         }
@@ -41,9 +41,9 @@ namespace iRentCar.VehicleActor
             : base(actorService, actorId, actorFactory, serviceFactory)
         {
             if (vehiclesServiceProxy == null)
-                throw new ArgumentNullException(nameof(vehiclesServiceProxy));
-
-            this.vehiclesServiceProxy = vehiclesServiceProxy;
+                this.vehiclesServiceProxy = VehiclesServiceProxy.Instance;
+            else
+                this.vehiclesServiceProxy = vehiclesServiceProxy;
         }
 
         private readonly IVehiclesServiceProxy vehiclesServiceProxy;

@@ -9,5 +9,6 @@ namespace iRentCar.Core
         public const string UserActorUri = "fabric:/iRentCar/UserActor";
         public const string VehiclesServiceUri = "fabric:/iRentCar/VehiclesService";
         public const string VehicleActorUri = "fabric:/iRentCar/VehicleActor";
+        public const string InvoicesServiceUri = "fabric:/iRentCar/InvoicesService";
     }
 }

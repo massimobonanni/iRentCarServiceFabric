@@ -5,9 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using iRentCar.Core.Implementations;
 using iRentCar.Core.Interfaces;
-using iRentCar.UserActor.Interfaces;
+using iRentCar.InvoicesService.Interfaces;
+using UserActorInterfaces = iRentCar.UserActor.Interfaces;
+using InvoicesServiceInterfaces = iRentCar.InvoicesService.Interfaces;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
+using iRentCar.UserActor.Interfaces;
+using System.Fabric.Health;
+using System.Fabric;
 
 namespace iRentCar.UserActor
 {
@@ -24,22 +29,27 @@ namespace iRentCar.UserActor
     internal class UserActor : Core.Implementations.ActorBase, IUserActor
     {
         public UserActor(ActorService actorService, ActorId actorId)
-            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository())
+            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
         {
 
         }
 
         public UserActor(ActorService actorService, ActorId actorId, IActorFactory actorFactory,
-            IServiceFactory serviceFactory, IUsersRepository userRepository)
+            IServiceFactory serviceFactory, IUsersRepository userRepository, IInvoicesServiceProxy invoicesServiceProxy)
             : base(actorService, actorId, actorFactory, serviceFactory)
         {
             if (userRepository == null)
                 throw new ArgumentNullException(nameof(userRepository));
-
             this.userRepository = userRepository;
+
+            if (invoicesServiceProxy == null)
+                this.invoicesServiceProxy = InvoicesServiceProxy.Instance;
+            else
+                this.invoicesServiceProxy = invoicesServiceProxy;
         }
 
         private readonly IUsersRepository userRepository;
+        private readonly IInvoicesServiceProxy invoicesServiceProxy;
 
         /// <summary>
         /// This method is called whenever an actor is activated.
@@ -65,9 +75,14 @@ namespace iRentCar.UserActor
                     };
                     await SetUserDataIntoStateAsync(userData);
                 }
+                else
+                {
+                    this.ReportHealthForUserUnknown();
+                }
             }
 
         }
+
 
         private const string CurrentRentedCarKeyName = "CurrentRentedCar";
         private const string InvoikeKeyNamePrefix = "Invoice_";
@@ -128,10 +143,19 @@ namespace iRentCar.UserActor
 
         #endregion [ StateManager accessor ]
 
+        #region [ Diagnostics ]
+        private void ReportHealthForUserUnknown()
+        {
+            this.ReportHealthInformation("Identity", "The user is unknown!", HealthState.Warning, 60);
+        }
+        #endregion [ Diagnostics ]
+
+        #region [ IUserActor interface ]
         private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var userData = await GetUserDataFromStateAsync(default(CancellationToken));
-
+            if (userData == null)
+                ReportHealthForUserUnknown();
             return userData != null;
         }
 
@@ -177,19 +201,21 @@ namespace iRentCar.UserActor
 
             if (currentRentVehicle != null)
             {
-                // TODO: Interazione con la fattura
                 currentRentVehicle.EndRent = DateTime.Now;
                 var amount = currentRentVehicle.CalculateCost();
 
-                var invoice = new InvoiceData()
+                var invoice = await this.invoicesServiceProxy.GenerateInvoiceAsync(this.Id.ToString(), amount.Value,
+                    currentRentVehicle.EndRent.Value, cancellationToken);
+
+                var localInvoice = new InvoiceData()
                 {
-                    Amount = amount.Value,
-                    Number = DateTime.Now.Ticks.ToString(),
-                    ReleaseDate = DateTime.Now,
-                    State = InvoiceState.NotPaid
+                    Amount = invoice.Amount,
+                    Number = invoice.InvoiceNumber,
+                    ReleaseDate = invoice.ReleaseDate,
+                    State = invoice.State == InvoicesServiceInterfaces.InvoiceState.Paid ? InvoiceState.Paid : InvoiceState.NotPaid,
                 };
 
-                await SetInvoiceDataIntoStateAsync(invoice, cancellationToken);
+                await SetInvoiceDataIntoStateAsync(localInvoice, cancellationToken);
                 await SetRentDataIntoStateAsync(null, cancellationToken);
             }
             else
@@ -205,7 +231,7 @@ namespace iRentCar.UserActor
             return this.IsValidInternalAsync(cancellationToken);
         }
 
-        public async Task<InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken)
+        public async Task<UserActorInterfaces.InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken)
         {
             var invoice = await GetActiveInvoiceAsync(cancellationToken);
             return invoice;
@@ -241,6 +267,23 @@ namespace iRentCar.UserActor
             }
 
             return userInfo;
+        }
+        #endregion [ IUserActor interface ]
+
+        protected void ReportHealthInformation(string sourceId, string property, string description,
+            HealthState state, int secondsToLive)
+        {
+            HealthInformation healthInformation = new HealthInformation(sourceId, property, state);
+            healthInformation.Description = description;
+            if (secondsToLive > 0) healthInformation.TimeToLive = TimeSpan.FromSeconds(secondsToLive);
+            healthInformation.RemoveWhenExpired = true;
+            try
+            {
+                this.ActorService.Context.CodePackageActivationContext.re
+                var activationContext = FabricRuntime.GetActivationContext();
+                activationContext.ReportApplicationHealth(healthInformation);
+            }
+            catch { }
         }
     }
 }

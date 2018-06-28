@@ -19,6 +19,11 @@ namespace iRentCar.VehiclesService.Interfaces
 
         private static readonly object singletonLock = new object();
 
+        private VehiclesServiceProxy()
+        {
+
+        }
+
         static VehiclesServiceProxy()
         {
             serviceUri = new Uri(UriConstants.VehiclesServiceUri);
@@ -66,7 +71,8 @@ namespace iRentCar.VehiclesService.Interfaces
                 foreach (var partition in partitionInfoList)
                 {
                     var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey,
+                        Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector.RandomSecondaryReplica);
                     taskList.Add(proxy.SearchVehiclesAsync(plate, model, brand, state, cancellationToken));
                 }
                 await Task.WhenAll(taskList);
@@ -89,7 +95,8 @@ namespace iRentCar.VehiclesService.Interfaces
                 foreach (var partition in partitionInfoList)
                 {
                     var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey,
+                        Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector.RandomSecondaryReplica);
                     taskList.Add(proxy.GetVehicleByPlateAsync(plate, cancellationToken));
                 }
                 await Task.WhenAll(taskList);
@@ -122,7 +129,7 @@ namespace iRentCar.VehiclesService.Interfaces
                 throw;
             }
 
-            var result = taskList.Select(t => t.Result).Any(a=>a);
+            var result = taskList.Select(t => t.Result).Any(a => a);
             return result;
         }
     }

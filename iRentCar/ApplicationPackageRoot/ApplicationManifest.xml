@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="iRentCarType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="InvoicesService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="InvoicesService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="InvoicesService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="VehiclesService_PartitionCount" DefaultValue="10" />
     <Parameter Name="VehiclesService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="VehiclesService_TargetReplicaSetSize" DefaultValue="3" />
@@ -16,6 +19,10 @@
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="iRentCar.InvoicesServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="iRentCar.VehicleActorPkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -28,6 +35,11 @@
     <ServiceManifestRef ServiceManifestName="iRentCar.VehiclesServicePkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <DefaultServices>
+    <Service Name="InvoicesService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="InvoicesServiceType" TargetReplicaSetSize="[InvoicesService_TargetReplicaSetSize]" MinReplicaSetSize="[InvoicesService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[InvoicesService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
     <Service Name="VehiclesService">
       <StatefulService ServiceTypeName="VehiclesServiceType" TargetReplicaSetSize="[VehiclesService_TargetReplicaSetSize]" MinReplicaSetSize="[VehiclesService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[VehiclesService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
