@@ -26,7 +26,7 @@ namespace iRentCar.UserActor
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
     [ActorService(Name = "UserActor")]
-    internal class UserActor : Core.Implementations.ActorBase, IUserActor
+    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable
     {
         public UserActor(ActorService actorService, ActorId actorId)
             : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
@@ -173,13 +173,9 @@ namespace iRentCar.UserActor
 
             if (currentRentVehicle == null)
             {
-                currentRentVehicle = new RentData()
-                {
-                    StartRent = rentInfo.StartRent,
-                    VehicleDailyCost = rentInfo.DailyCost,
-                    VehiclePlate = rentInfo.Plate
-                };
+                currentRentVehicle = rentInfo.ToRentData();
                 await SetRentDataIntoStateAsync(currentRentVehicle, cancellationToken);
+                await this.RegisterReminderAsync(EndTimeExpiredReminderName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
             }
             else
             {
@@ -202,10 +198,10 @@ namespace iRentCar.UserActor
             if (currentRentVehicle != null)
             {
                 currentRentVehicle.EndRent = DateTime.Now;
-                var amount = currentRentVehicle.CalculateCost();
+                var amount = currentRentVehicle.CalculateCost(DateTime.Now);
 
                 var invoice = await this.invoicesServiceProxy.GenerateInvoiceAsync(this.Id.ToString(), amount.Value,
-                    currentRentVehicle.EndRent.Value, cancellationToken);
+                   DateTime.Now, cancellationToken);
 
                 var localInvoice = new InvoiceData()
                 {
@@ -268,22 +264,30 @@ namespace iRentCar.UserActor
 
             return userInfo;
         }
+
         #endregion [ IUserActor interface ]
 
-        protected void ReportHealthInformation(string sourceId, string property, string description,
-            HealthState state, int secondsToLive)
+        #region [ Reminder ]  
+
+        private const string EndTimeExpiredReminderName = "EndTimeExpiredReminderName";
+        public async Task ReceiveReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)
         {
-            HealthInformation healthInformation = new HealthInformation(sourceId, property, state);
-            healthInformation.Description = description;
-            if (secondsToLive > 0) healthInformation.TimeToLive = TimeSpan.FromSeconds(secondsToLive);
-            healthInformation.RemoveWhenExpired = true;
-            try
+            if (reminderName == EndTimeExpiredReminderName)
             {
-                this.ActorService.Context.CodePackageActivationContext.re
-                var activationContext = FabricRuntime.GetActivationContext();
-                activationContext.ReportApplicationHealth(healthInformation);
+                var rentData = await this.GetRentDataFromStateAsync();
+                if (rentData.IsRentTimeExpired(DateTime.Now))
+                {
+                    var userInfo = await this.GetUserDataFromStateAsync();
+                    if (!string.IsNullOrWhiteSpace(userInfo.Email))
+                    {
+                        //TODO invio mail!!!
+
+                        var reminder = this.GetReminder(reminderName);
+                        await this.UnregisterReminderAsync(reminder);
+                    }
+                }
             }
-            catch { }
         }
+        #endregion [ Reminder ]
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using InvoicesServiceInterfaces = iRentCar.InvoicesService.Interfaces;
 
 namespace iRentCar.UserActor
 {
@@ -32,7 +33,22 @@ namespace iRentCar.UserActor
             {
                 DailyCost = data.VehicleDailyCost,
                 Plate = data.VehiclePlate,
-                StartRent = data.StartRent
+                StartRent = data.StartRent,
+                EndRent = data.EndRent
+            };
+        }
+
+        internal static RentData ToRentData(this RentInfo info)
+        {
+            if (info == null)
+                throw new NullReferenceException(nameof(info));
+
+            return new RentData()
+            {
+                VehicleDailyCost = info.DailyCost,
+                VehiclePlate = info.Plate,
+                StartRent = info.StartRent,
+                EndRent = info.EndRent
             };
         }
 
@@ -48,5 +64,21 @@ namespace iRentCar.UserActor
                 ReleaseDate = data.ReleaseDate
             };
         }
+
+        internal static InvoiceData ToInvoiceData(this InvoicesServiceInterfaces.InvoiceInfo info)
+        {
+            if (info == null)
+                throw new NullReferenceException(nameof(info));
+
+            return new InvoiceData()
+            {
+                Amount = info.Amount,
+                Number = info.InvoiceNumber,
+                ReleaseDate = info.ReleaseDate,
+                State = info.State == InvoicesServiceInterfaces.InvoiceState.Paid ?
+                            InvoiceState.Paid : InvoiceState.NotPaid,
+            };
+        }
+
     }
 }

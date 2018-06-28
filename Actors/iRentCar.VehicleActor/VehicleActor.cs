@@ -133,7 +133,9 @@ namespace iRentCar.VehicleActor
             var response = await actorProxy.RentVehicleAsync(new UserActorInterfaces.RentInfo()
             {
                 DailyCost = info.DailyCost,
-                Plate = this.Id.ToString()
+                Plate = this.Id.ToString(),
+                StartRent = startReservation,
+                EndRent = endReservation
             }, cancellationToken);
 
             if (response != UserActorError.Ok)
@@ -176,23 +178,16 @@ namespace iRentCar.VehicleActor
 
         public async Task<VehicleActorInterface.VehicleInfo> GetInfoAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                var info = await GetVehicleInfoFromStateAsync(cancellationToken);
-                var state = await GetVehicleStateFromStateAsync(cancellationToken);
-                var rentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
+            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+            var state = await GetVehicleStateFromStateAsync(cancellationToken);
+            var rentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
 
-                var response = info.ToInterfacesInfo();
-                response.State = state;
-                response.CurrentRent = rentInfo;
+            var response = info.ToInterfacesInfo();
+            response.Plate = this.Id.ToString();
+            response.State = state;
+            response.CurrentRent = rentInfo;
 
-                return response;
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            return response;
         }
         #endregion [ IVehicleActor interface ]
     }

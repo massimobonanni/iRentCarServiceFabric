@@ -7,6 +7,8 @@ namespace iRentCar.VehicleActor.Interfaces
     public class VehicleInfo
     {
         [DataMember]
+        public string Plate { get; set; }
+        [DataMember]
         public string Model { get; set; }
         [DataMember]
         public string Brand { get; set; }

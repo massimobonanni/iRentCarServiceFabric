@@ -13,15 +13,16 @@ namespace iRentCar.UserActor
         [DataMember]
         public DateTime StartRent { get; set; }
         [DataMember]
-        public DateTime? EndRent { get; set; }
+        public DateTime EndRent { get; set; }
 
-
-        public decimal? CalculateCost()
+        public bool IsRentTimeExpired(DateTime returnDate)
         {
-            if (!EndRent.HasValue)
-                return null;
+            return returnDate > EndRent;
+        }
 
-            var dayDuration = (int)Math.Floor((EndRent.Value - StartRent).TotalDays + 1);
+        public decimal? CalculateCost(DateTime returnDate)
+        {
+            var dayDuration = (int)Math.Floor((returnDate - StartRent).TotalDays + 1);
 
             return dayDuration * VehicleDailyCost;
         }

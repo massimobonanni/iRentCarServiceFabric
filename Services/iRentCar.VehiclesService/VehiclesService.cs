@@ -12,6 +12,7 @@ using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using VehicleInfo = iRentCar.VehiclesService.Interfaces.VehicleInfo;
 using VehicleState = iRentCar.VehiclesService.Interfaces.VehicleState;
 using Microsoft.ServiceFabric.Data;
+using System.Fabric.Description;
 
 namespace iRentCar.VehiclesService
 {
@@ -55,6 +56,12 @@ namespace iRentCar.VehiclesService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             await LoadVehiclesDictionaryAsync(cancellationToken);
+
+            this.Partition.ReportLoad(new List<LoadMetric> {
+                new LoadMetric("CurrentConnectionCount", 1234),
+                new LoadMetric("metric1", 42) });
+
+
 
             while (true)
             {

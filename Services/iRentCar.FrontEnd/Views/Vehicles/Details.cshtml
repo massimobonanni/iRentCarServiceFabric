@@ -4,39 +4,81 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
+<h2>Dettagli Autoveicolo</h2>
 
 <div>
-    <h4>VehicleInfo</h4>
-    <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Model)
+            Targa
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Model)
+            @Html.DisplayFor(model => model.Plate)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Brand)
+            Costruttore
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Brand)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.DailyCost)
+            Modello
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Model)
+        </dd>
+        <dt>
+            Costo Giornaliero (€)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.DailyCost)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.State)
+            Stato
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.State)
+            @switch (Model.State)
+            {
+                case iRentCar.VehicleActor.Interfaces.VehicleState.Busy:
+                    @: Prenotata
+                    break;
+                case iRentCar.VehicleActor.Interfaces.VehicleState.Free:
+                    @: Disponibile
+                    break;
+                case iRentCar.VehicleActor.Interfaces.VehicleState.NotAvailable:
+                    @: Non Utilizzabile
+                    break;
+            }
         </dd>
     </dl>
+    @{
+        var rentHidden = Model.CurrentRent == null ? "hidden" : "";
+    }
+    <div class="panel panel-default @rentHidden">
+        <div class="panel-heading">Noleggio</div>
+        <div class="panel-body">
+            <dl class="dl-horizontal">
+                <dt>
+                    Nome Utente
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.CurrentRent.User)
+                </dd>
+                <dt>
+                    Prenotata dal
+                </dt>
+                <dd>
+                    @Model.CurrentRent.StartDate.ToString("dd/MM/yyyy hh:mm")
+                </dd>
+                <dt>
+                    al
+                </dt>
+                <dd>
+                    @Model.CurrentRent.EndDate.ToString("dd/MM/yyyy hh:mm")
+                </dd>
+            </dl>
+        </div>
+    </div>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
     <a asp-action="Index">Back to List</a>
 </div>

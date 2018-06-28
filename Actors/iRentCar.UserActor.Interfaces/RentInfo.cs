@@ -11,7 +11,9 @@ namespace iRentCar.UserActor.Interfaces
         [DataMember]
         public decimal DailyCost { get; set; }
         [DataMember]
-        public DateTime StartRent { get; set; } = DateTime.Now;
+        public DateTime StartRent { get; set; } 
+        [DataMember]
+        public DateTime EndRent { get; set; } 
     }
 
 }

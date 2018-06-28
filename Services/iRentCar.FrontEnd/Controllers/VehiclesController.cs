@@ -57,7 +57,7 @@ namespace iRentCar.FrontEnd.Controllers
         public async Task<ActionResult> Details(string plate)
         {
             var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
-                new Uri(UriConstants.VehicleActorUri));
+                    new Uri(UriConstants.VehicleActorUri));
 
             var vehicleInfo = await actorProxy.GetInfoAsync(default(CancellationToken));
 

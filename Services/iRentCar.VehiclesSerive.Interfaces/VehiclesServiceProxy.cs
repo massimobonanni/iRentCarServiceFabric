@@ -71,8 +71,7 @@ namespace iRentCar.VehiclesService.Interfaces
                 foreach (var partition in partitionInfoList)
                 {
                     var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey,
-                        Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector.RandomSecondaryReplica);
+                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
                     taskList.Add(proxy.SearchVehiclesAsync(plate, model, brand, state, cancellationToken));
                 }
                 await Task.WhenAll(taskList);
@@ -95,8 +94,7 @@ namespace iRentCar.VehiclesService.Interfaces
                 foreach (var partition in partitionInfoList)
                 {
                     var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey,
-                        Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector.RandomSecondaryReplica);
+                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
                     taskList.Add(proxy.GetVehicleByPlateAsync(plate, cancellationToken));
                 }
                 await Task.WhenAll(taskList);
