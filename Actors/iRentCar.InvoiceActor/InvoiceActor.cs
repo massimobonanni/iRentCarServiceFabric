@@ -9,6 +9,8 @@ using Microsoft.ServiceFabric.Actors.Client;
 using iRentCar.InvoiceActor.Interfaces;
 using iRentCar.Core.Interfaces;
 using iRentCar.Core.Implementations;
+using System.Runtime.Serialization;
+using ActorInterfaces = iRentCar.InvoiceActor.Interfaces;
 
 namespace iRentCar.InvoiceActor
 {
@@ -24,12 +26,7 @@ namespace iRentCar.InvoiceActor
     [ActorService(Name = "InvoiceActor")]
     internal class InvoiceActor : iRentCar.Core.Implementations.ActorBase, IInvoiceActor
     {
-        /// <summary>
-        /// Initializes a new instance of InvoiceActor
-        /// </summary>
-        /// <param name="actorService">The Microsoft.ServiceFabric.Actors.Runtime.ActorService that will host this actor instance.</param>
-        /// <param name="actorId">The Microsoft.ServiceFabric.Actors.ActorId for this actor instance.</param>
-        public InvoiceActor(ActorService actorService, ActorId actorId) 
+        public InvoiceActor(ActorService actorService, ActorId actorId)
             : this(actorService, actorId, new ReliableFactory(), new ReliableFactory())
         {
         }
@@ -39,7 +36,7 @@ namespace iRentCar.InvoiceActor
             : base(actorService, actorId, actorFactory, serviceFactory)
         {
         }
-        
+
         /// <summary>
         /// This method is called whenever an actor is activated.
         /// An actor is activated the first time any of its methods are invoked.
@@ -51,6 +48,88 @@ namespace iRentCar.InvoiceActor
             return Task.CompletedTask;
         }
 
-        
+        private const string InvoiceDataKeyName = "InvoiceData";
+
+        public SerializationInfo UriConstants { get; private set; }
+
+        #region [ StateManager accessors ]
+        private async Task<InvoiceData> GetInvoiceDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var data = await this.StateManager.TryGetStateAsync<InvoiceData>(InvoiceDataKeyName, cancellationToken);
+            return data.HasValue ? data.Value : null;
+        }
+        private Task SetInvoiceDataIntoStateAsync(InvoiceData data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.StateManager.SetStateAsync<InvoiceData>(InvoiceDataKeyName, data, cancellationToken);
+        }
+        #endregion [ StateManager accessors ]
+
+        #region [ IInvoiceActor interfaces ]
+        public async Task<InvoiceActorError> CreateAsync(string customer, decimal amount, DateTime creationDate, string callbackUri, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(customer))
+                throw new ArgumentException(nameof(customer));
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            var invoiceData = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+
+            if (invoiceData != null)
+                return InvoiceActorError.InvoiceAlreadyExists;
+
+            var invoicedata = new InvoiceData()
+            {
+                Amount = amount,
+                CreationDate = creationDate,
+                Customer = customer,
+                State = InvoiceState.NotPaid,
+                CallbackUri = callbackUri
+            };
+            await this.SetInvoiceDataIntoStateAsync(invoicedata, cancellationToken);
+            return InvoiceActorError.Ok;
+        }
+
+        public async Task<ActorInterfaces.InvoiceInfo> GetInfoAsync(CancellationToken cancellationToken)
+        {
+            var invoiceData = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+
+            if (invoiceData != null)
+                return null;
+
+            return invoiceData.ToInvoiceInfo();
+        }
+
+        public async Task<InvoiceActorError> PaidAsync(DateTime payDate, CancellationToken cancellationToken)
+        {
+            var invoiceData = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+
+            if (invoiceData == null)
+                return InvoiceActorError.InvoiceNotValid;
+
+            if (invoiceData.State == InvoiceState.Paid)
+                return InvoiceActorError.InvoiceAlreadyPaid;
+
+            if (invoiceData.CreationDate > payDate)
+                return InvoiceActorError.PaymentDateNotCorrect;
+
+            invoiceData.PaymentDate = payDate;
+            invoiceData.State = InvoiceState.Paid;
+
+            if (!string.IsNullOrWhiteSpace(invoiceData.CallbackUri))
+            {
+                try
+                {
+                    var callbackProxy = this.actorFactory.Create<IInvoiceCallbackActor>(new ActorId(invoiceData.Customer),
+                            new Uri(invoiceData.CallbackUri));
+
+                    await callbackProxy.InvoicePaidAsync(this.Id.ToString(), payDate, cancellationToken);
+                }
+                catch { }
+            }
+
+            return InvoiceActorError.Ok;
+        }
+
+        #endregion [ IInvoiceActor interfaces ]
     }
 }

@@ -16,6 +16,11 @@ namespace iRentCar.InvoiceActor.Interfaces
     /// </summary>
     public interface IInvoiceActor : IActor
     {
-       
+        Task<InvoiceActorError> CreateAsync(string customer, decimal amount, DateTime creationDate, string callbackUri, CancellationToken cancellationToken);
+
+        Task<InvoiceActorError> PaidAsync(DateTime payDate, CancellationToken cancellationToken);
+
+        Task<InvoiceInfo> GetInfoAsync(CancellationToken cancellationToken);
+
     }
 }

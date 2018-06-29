@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using iRentCar.UserActor.Interfaces;
 using System.Fabric.Health;
 using System.Fabric;
+using iRentCar.InvoiceActor.Interfaces;
 
 namespace iRentCar.UserActor
 {
@@ -26,7 +27,7 @@ namespace iRentCar.UserActor
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
     [ActorService(Name = "UserActor")]
-    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable
+    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IInvoiceCallbackActor, IRemindable
     {
         public UserActor(ActorService actorService, ActorId actorId)
             : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
@@ -83,7 +84,6 @@ namespace iRentCar.UserActor
 
         }
 
-
         private const string CurrentRentedCarKeyName = "CurrentRentedCar";
         private const string InvoikeKeyNamePrefix = "Invoice_";
         private const string CurrentInvoikeKeyName = "CurrentInvoice";
@@ -120,7 +120,7 @@ namespace iRentCar.UserActor
             return this.StateManager.SetStateAsync<InvoiceData>(CurrentInvoikeKeyName, data, cancellationToken);
         }
 
-        private string GenerateInvoice(string invoiceNumber)
+        private string GenerateInvoiceKey(string invoiceNumber)
         {
             if (string.IsNullOrWhiteSpace(invoiceNumber))
                 throw new ArgumentException(nameof(invoiceNumber));
@@ -137,7 +137,7 @@ namespace iRentCar.UserActor
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
-            var invoiceKey = GenerateInvoice(data.Number);
+            var invoiceKey = GenerateInvoiceKey(data.Number);
             await this.StateManager.SetStateAsync<InvoiceData>(invoiceKey, data, cancellationToken);
         }
 
@@ -264,8 +264,24 @@ namespace iRentCar.UserActor
 
             return userInfo;
         }
-
+        
         #endregion [ IUserActor interface ]
+
+        #region [ IInvoiceCallbackActor interface ]
+        public async Task InvoicePaidAsync(string invoiceNumber, DateTime paymentDate, CancellationToken cancellationToken)
+        {
+            if (!string.IsNullOrWhiteSpace(invoiceNumber))
+            {
+                var currentInvoice = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+                if (currentInvoice.Number == invoiceNumber)
+                {
+                    var invoiceKey = this.GenerateInvoiceKey(currentInvoice.Number);
+                    await this.StateManager.SetStateAsync<InvoiceData>(invoiceKey, currentInvoice, cancellationToken);
+                    await this.SetInvoiceDataIntoStateAsync(null);
+                }
+            }
+        }
+        #endregion [ IInvoiceCallbackActor interface ]
 
         #region [ Reminder ]  
 
@@ -288,6 +304,7 @@ namespace iRentCar.UserActor
                 }
             }
         }
+
         #endregion [ Reminder ]
     }
 }
