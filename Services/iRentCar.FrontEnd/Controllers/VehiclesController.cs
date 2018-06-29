@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using iRentCar.VehicleActor.Interfaces;
 using Microsoft.ServiceFabric.Actors;
 using iRentCar.Core;
+using iRentCar.UserActor.Interfaces;
+using iRentCar.FrontEnd.Models.Dto;
 
 namespace iRentCar.FrontEnd.Controllers
 {
@@ -30,7 +32,6 @@ namespace iRentCar.FrontEnd.Controllers
         private readonly VehiclesServiceInterfaces.IVehiclesServiceProxy vehiclesServiceProxy;
         private readonly CoreInterfaces.IActorFactory actorFactory;
 
-        // GET: Vehicles
         public async Task<ActionResult> Index(string brand, string model, string plate, VehiclesServiceInterfaces.VehicleState? state, int pageIndex = 0, int pageSize = 10)
         {
             var vehicles =
@@ -53,7 +54,6 @@ namespace iRentCar.FrontEnd.Controllers
             return View(result);
         }
 
-        // GET: Vehicles/Details/5
         public async Task<ActionResult> Details(string plate)
         {
             var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
@@ -66,6 +66,78 @@ namespace iRentCar.FrontEnd.Controllers
 
             return View(vehicleInfo);
         }
+
+        public async Task<ActionResult> Reserve(string plate)
+        {
+            var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
+                    new Uri(UriConstants.VehicleActorUri));
+
+            var vehicleInfo = await actorProxy.GetInfoAsync(default(CancellationToken));
+
+            if (vehicleInfo == null || !vehicleInfo.IsValid())
+                return NotFound();
+
+            return View(vehicleInfo);
+        }
+
+        // POST: Vehicles/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Reserve([FromBody]RentInfoDto reservation)
+        {
+            if (!ModelState.IsValid)
+                return View();
+
+            if (reservation.StartDate > reservation.EndDate)
+            {
+                ModelState.AddModelError("", "La data di inizio noleggio deve essere inferiore alla data di fine noleggio");
+                return View();
+            }
+
+            var vehicleProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(reservation.Plate),
+                           new Uri(UriConstants.VehicleActorUri));
+
+            var vehicleInfo = await vehicleProxy.GetInfoAsync(default(CancellationToken));
+
+            if (vehicleInfo == null || !vehicleInfo.IsValid())
+                return NotFound();
+
+            var userProxy = this.actorFactory.Create<IUserActor>(new ActorId(reservation.Customer),
+                       new Uri(UriConstants.VehicleActorUri));
+
+            var result = await userProxy.RentVehicleAsync(new UserActor.Interfaces.RentInfo()
+            {
+                Plate = reservation.Plate,
+                DailyCost = vehicleInfo.DailyCost,
+                StartRent = reservation.StartDate,
+                EndRent = reservation.EndDate
+            }, default(CancellationToken));
+
+            if (result == UserActorError.Ok)
+                return RedirectToAction(nameof(Index));
+
+            switch (result)
+            {
+                case UserActorError.Ok:
+                    break;
+                case UserActorError.UserNotValid:
+                    ModelState.AddModelError("", "L'utente non è valido o non è registrato");
+                    break;
+                case UserActorError.VehicleAlreadyRented:
+                    ModelState.AddModelError("", "L'utente ha già un'autovettura assegnata");
+                    break;
+                case UserActorError.VehicleNotRented:
+                    ModelState.AddModelError("", "Il veicolo non è prenotabile");
+                    break;
+                case UserActorError.InternalActorError:
+                    ModelState.AddModelError("", "Si è verificato un errore nella procedura di prenotazione");
+                    break;
+                default:
+                    break;
+            }
+            return View();
+        }
+
 
         // GET: Vehicles/Create
         public ActionResult Create()
