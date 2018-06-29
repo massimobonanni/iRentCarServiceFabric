@@ -14,10 +14,16 @@
     <Parameter Name="VehicleActor_PartitionCount" DefaultValue="10" />
     <Parameter Name="VehicleActor_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="VehicleActor_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="InvoiceActor_PartitionCount" DefaultValue="10" />
+    <Parameter Name="InvoiceActor_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="InvoiceActor_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="iRentCar.InvoiceActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="iRentCar.InvoicesServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -58,6 +64,11 @@
     <Service Name="VehicleActor" GeneratedIdRef="c4d5c41d-5db1-4d07-8c79-ac00bd7515ba|Persisted">
       <StatefulService ServiceTypeName="VehicleActorType" TargetReplicaSetSize="[VehicleActor_TargetReplicaSetSize]" MinReplicaSetSize="[VehicleActor_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[VehicleActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="InvoiceActor" GeneratedIdRef="2f18100a-e6be-4473-9459-268fe76cac9a|Persisted">
+      <StatefulService ServiceTypeName="InvoiceActorType" TargetReplicaSetSize="[InvoiceActor_TargetReplicaSetSize]" MinReplicaSetSize="[InvoiceActor_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[InvoiceActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
     <!-- The section below creates instances of service types, when an instance of this 
