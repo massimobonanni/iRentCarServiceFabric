@@ -167,9 +167,9 @@ namespace iRentCar.VehiclesService
                 var tryVehicle = await this.vehiclesDictionary.TryGetValueAsync(tx, plate, TimeSpan.FromSeconds(5), cancellationToken);
                 if (tryVehicle.HasValue)
                 {
-                    var vehicle = tryVehicle.Value;
-                    vehicle.State = newState;
-                    await this.vehiclesDictionary.SetAsync(tx, plate, vehicle, TimeSpan.FromSeconds(5),
+                    var newVehicle = new VehicleInfo(tryVehicle.Value);
+                    newVehicle.State = newState;
+                    await this.vehiclesDictionary.SetAsync(tx, plate, newVehicle, TimeSpan.FromSeconds(5),
                         cancellationToken);
                     result = true;
                 }

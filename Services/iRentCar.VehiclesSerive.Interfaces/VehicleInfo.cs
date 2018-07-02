@@ -6,6 +6,23 @@ namespace iRentCar.VehiclesService.Interfaces
     [DataContract]
     public class VehicleInfo
     {
+        public VehicleInfo()
+        {
+
+        }
+
+        public VehicleInfo(VehicleInfo source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            this.Brand = source.Brand;
+            this.DailyCost = source.DailyCost;
+            this.Model = source.Model;
+            this.Plate = source.Plate;
+            this.State = source.State;
+        }
+
         [DataMember]
         public string Plate { get; set; }
         [DataMember]
