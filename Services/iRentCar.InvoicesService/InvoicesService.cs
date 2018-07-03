@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using iRentCar.InvoicesService.Interfaces;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
@@ -19,6 +20,10 @@ namespace iRentCar.InvoicesService
     {
         public InvoicesService(StatefulServiceContext context)
             : base(context)
+        { }
+
+        public InvoicesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager)
+            : base(context, stateManager)
         { }
 
         private IReliableDictionary<string, uint> invoiceNumbersDictionary;
@@ -56,8 +61,8 @@ namespace iRentCar.InvoicesService
         }
 
         #region [ IInvoicesService interface ]
-        public async Task<InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount, 
-            DateTime releaseDate,CancellationToken cancellationToken)
+        public async Task<InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount,
+            DateTime releaseDate, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(customer))
                 throw new ArgumentException(nameof(customer));

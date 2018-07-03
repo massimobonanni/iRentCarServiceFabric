@@ -12,6 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestFriend.cs~RFd30c23.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
   </ItemGroup>
 

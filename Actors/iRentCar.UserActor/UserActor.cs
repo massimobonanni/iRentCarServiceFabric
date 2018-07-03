@@ -82,6 +82,15 @@ namespace iRentCar.UserActor
                 }
             }
 
+
+            string reminderName = "Pay cell phone bill";
+            int amountInDollars = 100;
+
+            IActorReminder reminderRegistration = await this.RegisterReminderAsync(
+                reminderName,
+                BitConverter.GetBytes(amountInDollars),
+                TimeSpan.FromDays(3),    //The amount of time to delay before firing the reminder
+                TimeSpan.FromDays(1));    //The time interval between firing of reminders
         }
 
         private const string CurrentRentedCarKeyName = "CurrentRentedCar";
@@ -264,7 +273,7 @@ namespace iRentCar.UserActor
 
             return userInfo;
         }
-        
+
         #endregion [ IUserActor interface ]
 
         #region [ IInvoiceCallbackActor interface ]
@@ -291,16 +300,24 @@ namespace iRentCar.UserActor
             if (reminderName == EndTimeExpiredReminderName)
             {
                 var rentData = await this.GetRentDataFromStateAsync();
-                if (rentData.IsRentTimeExpired(DateTime.Now))
+                if (rentData != null)
                 {
-                    var userInfo = await this.GetUserDataFromStateAsync();
-                    if (!string.IsNullOrWhiteSpace(userInfo.Email))
+                    if (rentData.IsRentTimeExpired(DateTime.Now))
                     {
-                        //TODO invio mail!!!
+                        var userInfo = await this.GetUserDataFromStateAsync();
+                        if (!string.IsNullOrWhiteSpace(userInfo.Email))
+                        {
+                            //TODO invio mail!!!
 
-                        var reminder = this.GetReminder(reminderName);
-                        await this.UnregisterReminderAsync(reminder);
+                            var reminder = this.GetReminder(reminderName);
+                            await this.UnregisterReminderAsync(reminder);
+                        }
                     }
+                }
+                else
+                {
+                    var reminder = this.GetReminder(reminderName);
+                    await this.UnregisterReminderAsync(reminder);
                 }
             }
         }

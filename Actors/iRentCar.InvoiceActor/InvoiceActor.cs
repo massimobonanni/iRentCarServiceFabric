@@ -48,7 +48,7 @@ namespace iRentCar.InvoiceActor
             return Task.CompletedTask;
         }
 
-        private const string InvoiceDataKeyName = "InvoiceData";
+        internal const string InvoiceDataKeyName = "InvoiceData";
 
         public SerializationInfo UriConstants { get; private set; }
 
