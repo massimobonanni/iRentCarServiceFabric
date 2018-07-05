@@ -13,12 +13,71 @@
   <Class Name="Microsoft.ServiceFabric.Actors.ActorId">
     <Position X="3.75" Y="3.75" Width="2" />
     <TypeIdentifier />
-    <ShowAsAssociation>
-      <Property Name="Kind" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="Microsoft.ServiceFabric.Actors.ActorIdKind">
     <Position X="6.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="System.Fabric.FabricClient">
+    <Position X="0.75" Y="9.5" Width="4.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="System.Fabric.FabricClient.PropertyManagementClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ClusterManagementClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ClaimsRetrievalEventArgs" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ComposeDeploymentClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.FaultManagementClient">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.QueryClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ServiceGroupManagementClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ApplicationManagementClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.TestManagementClient">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ServiceManagementClient" Collapsed="true">
+        <NestedTypes>
+          <Class Name="System.Fabric.FabricClient.ServiceManagementClient.ServiceNotificationEventArgs" Collapsed="true">
+            <TypeIdentifier />
+          </Class>
+        </NestedTypes>
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.GatewayInformationEventArgs" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.ClaimsRetrievalEventHandler" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.RepairManagementClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.InfrastructureServiceClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+      <Class Name="System.Fabric.FabricClient.HealthClient" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+    </NestedTypes>
     <TypeIdentifier />
   </Class>
   <Interface Name="Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager">

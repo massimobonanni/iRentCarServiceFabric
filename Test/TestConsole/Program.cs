@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Fabric;
+using System.Fabric.Chaos.DataStructures;
 using System.Threading;
 using iRentCar.Core;
 using iRentCar.Core.Implementations;
@@ -25,6 +27,20 @@ namespace TestConsole
                 new Uri("fabric:/iRentCar/UserActor"));
 
             var response = actorProxy.IsValidAsync(default(CancellationToken)).GetAwaiter().GetResult();
+
+
+            //using (var client = new FabricClient())
+            //{
+            //    var chaosParams = new ChaosParameters()
+            //    {
+            //        MaxConcurrentFaults = 3,
+            //        WaitTimeBetweenFaults = TimeSpan.FromMinutes(5),
+            //        WaitTimeBetweenIterations = TimeSpan.FromMinutes(5)
+            //    };
+
+            //    await client.TestManager.StartChaosAsync(chaosParams);
+            //};
+
         }
     }
 }

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Actors\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
     <ProjectReference Include="..\..\Actors\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
     <ProjectReference Include="..\..\Actors\iRentCar.VehicleActor.Interfaces\iRentCar.VehicleActor.Interfaces.csproj" />

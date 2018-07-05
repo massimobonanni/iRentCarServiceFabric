@@ -129,7 +129,7 @@ namespace iRentCar.FrontEnd.Controllers
                 case UserActorError.VehicleNotRented:
                     ModelState.AddModelError("", "Il veicolo non è prenotabile");
                     break;
-                case UserActorError.InternalActorError:
+                case UserActorError.GenericError:
                     ModelState.AddModelError("", "Si è verificato un errore nella procedura di prenotazione");
                     break;
                 default:

@@ -13,9 +13,9 @@ namespace iRentCar.VehicleActor.Interfaces
 
     public interface IVehicleActor : IActor
     {
-        Task<bool> ReserveAsync(string user, DateTime startReservation, DateTime endReservation, CancellationToken cancellationToken);
+        Task<VehicleActorError> ReserveAsync(string user, DateTime startReservation, DateTime endReservation, CancellationToken cancellationToken);
 
-        Task<bool> UnreserveAsync(CancellationToken cancellationToken);
+        Task<VehicleActorError> UnreserveAsync(CancellationToken cancellationToken);
 
         Task<VehicleInfo> GetInfoAsync(CancellationToken cancellationToken);
     }

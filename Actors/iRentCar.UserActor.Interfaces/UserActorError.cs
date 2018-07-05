@@ -14,7 +14,7 @@ namespace iRentCar.UserActor.Interfaces
         [EnumMember]
         VehicleNotRented = 11,
         [EnumMember]
-        InternalActorError = 999
+        GenericError = 999
 
-           }
+    }
 }
