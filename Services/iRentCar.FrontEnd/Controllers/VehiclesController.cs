@@ -36,6 +36,7 @@ namespace iRentCar.FrontEnd.Controllers
         {
             var vehicles =
                 await this.vehiclesServiceProxy.SearchVehiclesAsync(plate, model, brand, state, default(CancellationToken));
+
             var count = vehicles.Count();
             vehicles = vehicles.OrderBy(v => v.Plate);
             if (pageIndex >= 0 && pageSize > 0)
@@ -53,6 +54,7 @@ namespace iRentCar.FrontEnd.Controllers
 
             return View(result);
         }
+
 
         public async Task<ActionResult> Details(string plate)
         {
@@ -77,30 +79,38 @@ namespace iRentCar.FrontEnd.Controllers
             if (vehicleInfo == null || !vehicleInfo.IsValid())
                 return NotFound();
 
-            return View(vehicleInfo);
+            var modelForReserve = new VehicleInfoForReserveDto(vehicleInfo);
+
+            return View(modelForReserve);
         }
 
         // POST: Vehicles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Reserve([FromBody]RentInfoDto reservation)
+        public async Task<ActionResult> Reserve(string plate, VehicleInfoForReserveDto reservation)
         {
             if (!ModelState.IsValid)
                 return View();
 
-            if (reservation.StartDate > reservation.EndDate)
+            if (reservation.StartReservation > reservation.EndReservation)
             {
                 ModelState.AddModelError("", "La data di inizio noleggio deve essere inferiore alla data di fine noleggio");
                 return View();
             }
 
-            var vehicleProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(reservation.Plate),
+            var vehicleProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
                            new Uri(UriConstants.VehicleActorUri));
 
             var vehicleInfo = await vehicleProxy.GetInfoAsync(default(CancellationToken));
 
             if (vehicleInfo == null || !vehicleInfo.IsValid())
                 return NotFound();
+
+            if (vehicleInfo.State != VehicleState.Free)
+            {
+                ModelState.AddModelError("", "L'autovettura non e' piu' disponibile per il noleggio.");
+                return View();
+            }
 
             var userProxy = this.actorFactory.Create<IUserActor>(new ActorId(reservation.Customer),
                        new Uri(UriConstants.VehicleActorUri));
@@ -109,8 +119,8 @@ namespace iRentCar.FrontEnd.Controllers
             {
                 Plate = reservation.Plate,
                 DailyCost = vehicleInfo.DailyCost,
-                StartRent = reservation.StartDate,
-                EndRent = reservation.EndDate
+                StartRent = reservation.StartReservation,
+                EndRent = reservation.EndReservation
             }, default(CancellationToken));
 
             if (result == UserActorError.Ok)
