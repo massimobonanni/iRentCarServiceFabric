@@ -30,6 +30,15 @@ namespace iRentCar.VehiclesService
             this.vehiclesRepository = vehiclesRepository;
         }
 
+        public VehiclesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager, IVehiclesRepository vehiclesRepository)
+          : base(context, stateManager)
+        {
+            if (vehiclesRepository == null)
+                throw new ArgumentNullException(nameof(vehiclesRepository));
+
+            this.vehiclesRepository = vehiclesRepository;
+        }
+
         private readonly IVehiclesRepository vehiclesRepository;
 
         private IReliableDictionary<string, VehicleInfo> vehiclesDictionary;
