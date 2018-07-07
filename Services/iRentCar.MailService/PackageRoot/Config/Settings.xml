@@ -16,5 +16,6 @@
     <Parameter Name="MailPort" Value="" MustOverride="true" />
     <Parameter Name="Username" Value="" MustOverride="true" />
     <Parameter Name="Password" Value="" MustOverride="true" />
+    <Parameter Name="UseSSL" Value="" MustOverride="true" />
   </Section>
 </Settings>

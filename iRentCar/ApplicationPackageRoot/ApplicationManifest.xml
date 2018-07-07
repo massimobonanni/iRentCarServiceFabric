@@ -21,10 +21,11 @@
     <Parameter Name="MailService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="MailService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="MailService_DelayBetweenMailSend" DefaultValue="00:00:10" />
-    <Parameter Name="NetSmtpClient_MailServer" DefaultValue="" />
-    <Parameter Name="NetSmtpClient_MailPort" DefaultValue="" />
-    <Parameter Name="NetSmtpClient_Username" DefaultValue="" />
-    <Parameter Name="NetSmtpClient_Password" DefaultValue="" />
+    <Parameter Name="NetSmtpClient_MailServer" DefaultValue="smtp.gmail.com" />
+    <Parameter Name="NetSmtpClient_MailPort" DefaultValue="465" />
+    <Parameter Name="NetSmtpClient_Username" DefaultValue="bonanni.massimo@gmail.com" />
+    <Parameter Name="NetSmtpClient_Password" DefaultValue="dedce5d1e6" />
+    <Parameter Name="NetSmtpClient_UseSSL" DefaultValue="true" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -42,6 +43,7 @@
             <Parameter Name="MailPort" Value="[NetSmtpClient_MailPort]" />
             <Parameter Name="Username" Value="[NetSmtpClient_Username]" />
             <Parameter Name="Password" Value="[NetSmtpClient_Password]" />
+            <Parameter Name="UseSSL" Value="[NetSmtpClient_UseSSL]" />
           </Section>
         </Settings>
       </ConfigOverride>

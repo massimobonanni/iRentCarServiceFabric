@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using iRentCar.Core.Implementations;
 using iRentCar.Core.Interfaces;
 using iRentCar.MailService.Interfaces;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -21,25 +22,40 @@ namespace iRentCar.MailService
     /// </summary>
     internal sealed class MailService : StatefulService, IMailService
     {
-        public MailService(StatefulServiceContext context, IActorFactory actorFactory = null)
+        public MailService(StatefulServiceContext context, MailAdapterBase mailAdapter, IActorFactory actorFactory = null)
             : base(context)
         {
+            if (mailAdapter == null)
+                throw new ArgumentNullException(nameof(mailAdapter));
+
             if (actorFactory == null)
                 this.actorFactory = new ReliableFactory();
             else
                 this.actorFactory = actorFactory;
+
+            this.mailAdapter = mailAdapter;
+            this.mailAdapter.SetParent(this);
         }
 
-        public MailService(StatefulServiceContext context, IReliableStateManagerReplica stateManager, IActorFactory actorFactory = null)
+        public MailService(StatefulServiceContext context, IReliableStateManagerReplica stateManager,
+            MailAdapterBase mailAdapter, IActorFactory actorFactory = null)
             : base(context, stateManager)
         {
+            if (mailAdapter == null)
+                throw new ArgumentNullException(nameof(mailAdapter));
+
             if (actorFactory == null)
                 this.actorFactory = new ReliableFactory();
             else
                 this.actorFactory = actorFactory;
+
+            this.mailAdapter = mailAdapter;
+            this.mailAdapter.SetParent(this);
         }
 
         private readonly IActorFactory actorFactory;
+        private readonly MailAdapterBase mailAdapter;
+
 
         internal const string MailQueueName = "MailQueue";
         private IReliableQueue<MailData> mailQueue;
@@ -124,6 +140,27 @@ namespace iRentCar.MailService
         }
         #endregion
 
+        #region [ Internal Methods ]
+        private async Task SendCallbackToCallerActorAsync(MailData mailData, MailAdapterResult sendResult, CancellationToken cancellationToken)
+        {
+            if (mailData.CallBack != null)
+            {
+                try
+                {
+                    var callbackProxy = this.actorFactory.Create<ICallBackMailService>(new ActorId(mailData.CallBack.ActorId),
+                                new Uri(mailData.CallBack.ServiceUri));
+
+                    await callbackProxy.MailSendCompletedAsync(mailData.Id, sendResult.ToMailSendResult(), cancellationToken);
+                }
+                catch
+                {
+                }
+            }
+
+        }
+
+        #endregion [ Internal Methods ]
+
         #region [ Tasks ]
         private async Task SendMailTaskCode(CancellationToken cancellationToken)
         {
@@ -134,14 +171,17 @@ namespace iRentCar.MailService
                 using (var trx = this.StateManager.CreateTransaction())
                 {
                     mailData = await this.mailQueue.TryPeekAsync(trx);
+                    await trx.CommitAsync();
                 }
 
                 if (!mailData.HasValue)
                 {
-                    await Task.Delay(this.DelayBetweenMailSend , cancellationToken);
+                    await Task.Delay(this.DelayBetweenMailSend, cancellationToken);
                     continue;
                 }
-                // invio mail mailData;
+
+                var sendResult = await this.mailAdapter.SendMailAsync(mailData.Value, cancellationToken);
+                await SendCallbackToCallerActorAsync(mailData.Value, sendResult, cancellationToken);
 
                 using (var trx = this.StateManager.CreateTransaction())
                 {
@@ -154,9 +194,18 @@ namespace iRentCar.MailService
 
         #region [ IMailService interface ]
 
-        public Task<MailServiceError> SendMailAsync(MailInfo mail, CallBackInfo callback, CancellationToken cancellationToken)
+        public async Task<MailServiceError> SendMailAsync(MailInfo mail, CallBackInfo callback, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (mail == null)
+                throw new ArgumentNullException(nameof(mail));
+
+            MailData mailData = new MailData(mail, callback);
+            using (var trx = this.StateManager.CreateTransaction())
+            {
+                await this.mailQueue.EnqueueAsync(trx, mailData);
+                await trx.CommitAsync();
+            }
+            return MailServiceError.Ok;
         }
         #endregion [ IMailService interface ]
 

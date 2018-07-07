@@ -18,6 +18,8 @@ namespace iRentCar.MailService
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
 
+            this.Id = info.Id;
+            this.From = info.From;
             this.BccAddresses = info.BccAddresses;
             this.Body = info.Body;
             this.CCAddresses = info.CCAddresses;
@@ -29,8 +31,10 @@ namespace iRentCar.MailService
         }
 
         [DataMember]
-        public Guid id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
+        [DataMember]
+        public string From { get; set; }
         [DataMember]
         public List<string> TOAddresses { get; set; }
         [DataMember]

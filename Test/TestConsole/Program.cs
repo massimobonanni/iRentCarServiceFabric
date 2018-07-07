@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Chaos.DataStructures;
 using System.Threading;
 using iRentCar.Core;
 using iRentCar.Core.Implementations;
+using iRentCar.MailService.Interfaces;
 using iRentCar.UserActor.Interfaces;
 using iRentCar.VehicleActor.Interfaces;
 using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
 
 namespace TestConsole
 {
@@ -14,6 +17,16 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
+            var mailService = ServiceProxy.Create<IMailService>(new Uri("fabric:/iRentCar/MailService"), 
+                new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(0));
+
+            MailInfo mail = new MailInfo();
+            mail.From = "massimo.bonanni@tiscali.it";
+            mail.TOAddresses = new List<string>() { "mabonann@microsoft.com" };
+            mail.Subject = "Test";
+            mail.Body = "Test";
+            var response= mailService.SendMailAsync(mail, null, default(CancellationToken)).GetAwaiter().GetResult();
+
             //var repo = new FakeVehiclesRepository();
 
             //var list = repo.GetAllVehiclesAsync(0, 100).GetAwaiter().GetResult();
@@ -23,10 +36,10 @@ namespace TestConsole
 
             //var response = actorProxy.GetInfoAsync(default(CancellationToken)).GetAwaiter().GetResult();
 
-            var actorProxy = ActorProxy.Create<IUserActor>(new Microsoft.ServiceFabric.Actors.ActorId("massimo.bonanni"),
-                new Uri("fabric:/iRentCar/UserActor"));
+            //var actorProxy = ActorProxy.Create<IUserActor>(new Microsoft.ServiceFabric.Actors.ActorId("massimo.bonanni"),
+            //    new Uri("fabric:/iRentCar/UserActor"));
 
-            var response = actorProxy.IsValidAsync(default(CancellationToken)).GetAwaiter().GetResult();
+            //var response = actorProxy.IsValidAsync(default(CancellationToken)).GetAwaiter().GetResult();
 
 
             //using (var client = new FabricClient())

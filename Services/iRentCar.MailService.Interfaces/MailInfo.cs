@@ -9,6 +9,10 @@ namespace iRentCar.MailService.Interfaces
     public class MailInfo
     {
         [DataMember]
+        public Guid Id { get; set; } = Guid.NewGuid();
+        [DataMember]
+        public string From { get; set; }
+        [DataMember]
         public List<string> TOAddresses { get; set; }
         [DataMember]
         public List<string> CCAddresses { get; set; }
