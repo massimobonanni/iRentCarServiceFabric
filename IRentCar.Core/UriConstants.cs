@@ -11,5 +11,6 @@ namespace iRentCar.Core
         public const string VehiclesServiceUri = "fabric:/iRentCar/VehiclesService";
         public const string VehicleActorUri = "fabric:/iRentCar/VehicleActor";
         public const string InvoicesServiceUri = "fabric:/iRentCar/InvoicesService";
+        public const string MailServiceUri = "fabric:/iRentCar/MailService";
     }
 }

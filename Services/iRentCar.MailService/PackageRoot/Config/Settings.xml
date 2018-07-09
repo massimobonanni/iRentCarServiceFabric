@@ -11,11 +11,9 @@
     <Parameter Name="DelayBetweenMailSend" Value="00:00:10" MustOverride="true" />
   </Section>
 
-  <Section Name="NetSmtpClient">
-    <Parameter Name="MailServer" Value="" MustOverride="true" />
-    <Parameter Name="MailPort" Value="" MustOverride="true" />
-    <Parameter Name="Username" Value="" MustOverride="true" />
-    <Parameter Name="Password" Value="" MustOverride="true" />
-    <Parameter Name="UseSSL" Value="" MustOverride="true" />
+  <Section Name="SendGridAdapter">
+    <Parameter Name="SendMailUri" Value="" MustOverride="true" />
+    <Parameter Name="ApiKey" Value="" MustOverride="true" />
+    <Parameter Name="FromAddress" Value="" MustOverride="true" />
   </Section>
 </Settings>

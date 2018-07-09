@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.1.274" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,48 +3,52 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using iRentCar.MailService.SendGrid;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace iRentCar.MailService
 {
-    internal class SmtpClientMailAdapter : MailAdapterBase
+    internal class SendGridMailAdapter : MailAdapterBase
     {
-        private string mailServer;
-        private int mailPort;
-        private string username;
-        private string password;
-        private bool useSSL;
+        private string sendMailUri;
+        private string apiKey;
+        private string fromAddress;
         private bool configurationCorrect;
 
         private const string ConfigurationHealthPropertyName = "Configuration";
 
         protected override void ConfigurationModified(object sender, PackageModifiedEventArgs<ConfigurationPackage> e)
         {
-            if (e.NewPackage.Settings.Sections.Contains("NetSmtpClient"))
+            if (e.NewPackage.Settings.Sections.Contains("SendGridAdapter"))
             {
-                var configSection = e.NewPackage.Settings.Sections["NetSmtpClient"];
-                this.configurationCorrect = GetConfigValue<string>(configSection, "MailServer", ref mailServer);
-                this.configurationCorrect &= GetConfigValue<int>(configSection, "MailPort", ref mailPort);
-                this.configurationCorrect &= GetConfigValue<string>(configSection, "Username", ref username);
-                this.configurationCorrect &= GetConfigValue<string>(configSection, "Password", ref password);
-                this.configurationCorrect &= GetConfigValue<bool>(configSection, "UseSSL", ref useSSL);
+                var configSection = e.NewPackage.Settings.Sections["SendGridAdapter"];
+                this.configurationCorrect = GetConfigValue<string>(configSection, "SendMailUri", ref sendMailUri);
+                this.configurationCorrect &= GetConfigValue<string>(configSection, "ApiKey", ref apiKey);
+                this.configurationCorrect &= GetConfigValue<string>(configSection, "FromAddress", ref fromAddress);
 
-                if (string.IsNullOrWhiteSpace(this.mailServer))
+                if (string.IsNullOrWhiteSpace(this.sendMailUri) && Uri.IsWellFormedUriString(this.sendMailUri, UriKind.Absolute))
                 {
                     this.parent.ReportHealthInformation(ConfigurationHealthPropertyName,
-                            $"Parameter 'MailServer' empty or null!", System.Fabric.Health.HealthState.Error);
+                            $"Parameter 'SendMailUri'not valid!", System.Fabric.Health.HealthState.Error);
                     this.configurationCorrect = false;
                 }
 
-                if (mailPort <= 0)
+                if (string.IsNullOrWhiteSpace(this.apiKey))
                 {
                     this.parent.ReportHealthInformation(ConfigurationHealthPropertyName,
-                            $"Parameter 'MailPort' negative!", System.Fabric.Health.HealthState.Error);
+                            $"Parameter 'ApiKey'not valid!", System.Fabric.Health.HealthState.Error);
+                    this.configurationCorrect = false;
+                }
+
+                if (string.IsNullOrWhiteSpace(this.fromAddress))
+                {
+                    this.parent.ReportHealthInformation(ConfigurationHealthPropertyName,
+                            $"Parameter 'FromAddress'not valid!", System.Fabric.Health.HealthState.Error);
                     this.configurationCorrect = false;
                 }
 
@@ -93,17 +97,19 @@ namespace iRentCar.MailService
             }
             try
             {
-                using (var client = new SmtpClient(this.mailServer, this.mailPort))
-                {
-                    client.Credentials = new NetworkCredential(this.username, this.password);
-                    client.EnableSsl = this.useSSL;
+                MailMessage mailMessage = CreateMailMessage(mail);
 
-                    MailMessage mailMessage = CreateMailMessage(mail);
-
-                    await client.SendMailAsync(mailMessage);
-                }
+                var client = new RestClient(this.sendMailUri);
+                var request = new RestRequest(Method.POST);
+                request.AddHeader("content-type", "application/json");
+                request.AddHeader("authorization", $"Bearer {this.apiKey}");
+                request.AddParameter("application/json",
+                    JsonConvert.SerializeObject(mailMessage), ParameterType.RequestBody);
+                var response = await client.ExecuteTaskAsync(request);
+                if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                    return MailAdapterResult.NotInfrastructuralError;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return MailAdapterResult.NotInfrastructuralError;
             }
@@ -113,31 +119,42 @@ namespace iRentCar.MailService
         private MailMessage CreateMailMessage(MailData mailData)
         {
             var mailMessage = new MailMessage();
-            mailMessage.Body = mailData.Body;
-            mailMessage.Subject = mailData.Subject;
-            mailMessage.From = new MailAddress(mailData.From);
-            mailMessage.IsBodyHtml = mailData.IsHtml;
+            var personalization = new Personalization();
+            personalization.subject = mailData.Subject;
             if (mailData.TOAddresses != null && mailData.TOAddresses.Any())
             {
+                personalization.to = new List<To>();
                 foreach (var address in mailData.TOAddresses)
                 {
-                    mailMessage.To.Add(address);
+                    personalization.to.Add(new To() { email = address });
                 }
             }
+
             if (mailData.BccAddresses != null && mailData.BccAddresses.Any())
             {
+                personalization.bcc = new List<Bcc>();
                 foreach (var address in mailData.BccAddresses)
                 {
-                    mailMessage.Bcc.Add(address);
+                    personalization.bcc.Add(new Bcc() { email = address });
                 }
             }
             if (mailData.CCAddresses != null && mailData.CCAddresses.Any())
             {
+                personalization.cc = new List<Cc>();
                 foreach (var address in mailData.CCAddresses)
                 {
-                    mailMessage.CC.Add(address);
+                    personalization.cc.Add(new Cc() { email = address });
                 }
             }
+            mailMessage.personalizations = new List<Personalization>();
+            mailMessage.personalizations.Add(personalization);
+            mailMessage.from = new From() { email = this.fromAddress };
+            mailMessage.content = new List<Content>();
+            mailMessage.content.Add(new Content()
+            {
+                type = mailData.IsHtml ? "text/html" : "text/plain",
+                value = mailData.Body
+            });
             return mailMessage;
         }
     }

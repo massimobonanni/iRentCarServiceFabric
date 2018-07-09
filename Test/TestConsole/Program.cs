@@ -17,15 +17,13 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            var mailService = ServiceProxy.Create<IMailService>(new Uri("fabric:/iRentCar/MailService"), 
-                new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(0));
-
             MailInfo mail = new MailInfo();
             mail.From = "massimo.bonanni@tiscali.it";
             mail.TOAddresses = new List<string>() { "mabonann@microsoft.com" };
             mail.Subject = "Test";
             mail.Body = "Test";
-            var response= mailService.SendMailAsync(mail, null, default(CancellationToken)).GetAwaiter().GetResult();
+
+            var response= MailServiceProxy.Instance.SendMailAsync(mail, null, default(CancellationToken)).GetAwaiter().GetResult();
 
             //var repo = new FakeVehiclesRepository();
 

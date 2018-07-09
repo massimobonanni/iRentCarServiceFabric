@@ -21,7 +21,7 @@ namespace iRentCar.MailService
                 // an instance of the class is created in this host process.
 
                 //var mailAdapter = new NeutralMailAdapter();
-                var mailAdapter = new SmtpClientMailAdapter();
+                var mailAdapter = new SendGridMailAdapter();
 
                 ServiceRuntime.RegisterServiceAsync("MailServiceType",
                     context => new MailService(context, mailAdapter)).GetAwaiter().GetResult();
