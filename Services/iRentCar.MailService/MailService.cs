@@ -199,15 +199,22 @@ namespace iRentCar.MailService
             if (mail == null)
                 throw new ArgumentNullException(nameof(mail));
 
-            MailData mailData = new MailData(mail, callback);
-            using (var trx = this.StateManager.CreateTransaction())
+            MailServiceError checkMail = mail.Check();
+
+            if (checkMail == MailServiceError.Ok)
             {
-                await this.mailQueue.EnqueueAsync(trx, mailData);
-                await trx.CommitAsync();
+                MailData mailData = new MailData(mail, callback);
+                using (var trx = this.StateManager.CreateTransaction())
+                {
+                    await this.mailQueue.EnqueueAsync(trx, mailData);
+                    await trx.CommitAsync();
+                }
             }
-            return MailServiceError.Ok;
+            return checkMail;
         }
+
         #endregion [ IMailService interface ]
+
 
     }
 }

@@ -148,7 +148,7 @@ namespace iRentCar.MailService
             }
             mailMessage.personalizations = new List<Personalization>();
             mailMessage.personalizations.Add(personalization);
-            mailMessage.from = new From() { email = this.fromAddress };
+            mailMessage.from = new From() { email = mailData.From ?? this.fromAddress };
             mailMessage.content = new List<Content>();
             mailMessage.content.Add(new Content()
             {

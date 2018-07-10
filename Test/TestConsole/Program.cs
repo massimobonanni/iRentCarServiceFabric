@@ -25,6 +25,7 @@ namespace TestConsole
 
             var response= MailServiceProxy.Instance.SendMailAsync(mail, null, default(CancellationToken)).GetAwaiter().GetResult();
 
+
             //var repo = new FakeVehiclesRepository();
 
             //var list = repo.GetAllVehiclesAsync(0, 100).GetAwaiter().GetResult();
