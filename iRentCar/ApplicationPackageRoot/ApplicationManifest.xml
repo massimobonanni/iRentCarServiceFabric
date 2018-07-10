@@ -8,6 +8,7 @@
     <Parameter Name="VehiclesService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="VehiclesService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="FrontEnd_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="PaymentGateway_InstanceCount" DefaultValue="1" />
     <Parameter Name="UserActor_PartitionCount" DefaultValue="10" />
     <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="UserActor_TargetReplicaSetSize" DefaultValue="3" />
@@ -59,6 +60,9 @@
     <ServiceManifestRef ServiceManifestName="iRentCar.FrontEndPkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="iRentCar.PaymentGatewayPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="iRentCar.UserActorPkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -77,6 +81,11 @@
     </Service>
     <Service Name="FrontEndService">
       <StatelessService ServiceTypeName="FrontEndType" InstanceCount="[FrontEnd_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="PaymentGateway">
+      <StatelessService ServiceTypeName="PaymentGatewayType" InstanceCount="[PaymentGateway_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>

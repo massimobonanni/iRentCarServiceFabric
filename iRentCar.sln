@@ -39,9 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.InvoiceActor.Inter
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.InvoiceActor.Test", "Test\iRentCar.InvoiceActor.Test\iRentCar.InvoiceActor.Test.csproj", "{8DD2BF0F-E901-436A-B2C6-265DB85FC1F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRentCar.MailService", "Services\iRentCar.MailService\iRentCar.MailService.csproj", "{D46BD5BA-E96E-41BD-BE6E-08996D2030C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.MailService", "Services\iRentCar.MailService\iRentCar.MailService.csproj", "{D46BD5BA-E96E-41BD-BE6E-08996D2030C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRentCar.MailService.Interfaces", "Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj", "{74E7583A-B902-4ACA-8468-6335DDC2535E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.MailService.Interfaces", "Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj", "{74E7583A-B902-4ACA-8468-6335DDC2535E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.PaymentGateway", "Services\iRentCar.PaymentGateway\iRentCar.PaymentGateway.csproj", "{E98074CA-898F-4DD8-B339-41545AAEFFFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +191,14 @@ Global
 		{74E7583A-B902-4ACA-8468-6335DDC2535E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{74E7583A-B902-4ACA-8468-6335DDC2535E}.Release|x64.ActiveCfg = Release|Any CPU
 		{74E7583A-B902-4ACA-8468-6335DDC2535E}.Release|x64.Build.0 = Release|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Debug|x64.Build.0 = Debug|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Release|x64.ActiveCfg = Release|Any CPU
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +219,7 @@ Global
 		{8DD2BF0F-E901-436A-B2C6-265DB85FC1F9} = {5003E640-BF0C-4A20-BA13-1E26BC33AC2E}
 		{D46BD5BA-E96E-41BD-BE6E-08996D2030C4} = {445204CB-9330-4BFB-B3AE-3AFCF13A3B99}
 		{74E7583A-B902-4ACA-8468-6335DDC2535E} = {445204CB-9330-4BFB-B3AE-3AFCF13A3B99}
+		{E98074CA-898F-4DD8-B339-41545AAEFFFD} = {445204CB-9330-4BFB-B3AE-3AFCF13A3B99}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A8E88FF-D94C-4AAA-AB3E-262A5DFD269A}
