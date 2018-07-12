@@ -111,10 +111,11 @@ namespace iRentCar.MailService
             var config = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
             this.ReadSettings(config.Settings);
             this.Context.CodePackageActivationContext.ConfigurationPackageModifiedEvent +=
-                this.CodePackageActivationContext_ConfigurationPackageModifiedEvent;
+                this.ConfigurationPackageModifiedEvent;
         }
 
-        private void CodePackageActivationContext_ConfigurationPackageModifiedEvent(object sender, PackageModifiedEventArgs<ConfigurationPackage> e)
+        private void ConfigurationPackageModifiedEvent(object sender, 
+            PackageModifiedEventArgs<ConfigurationPackage> e)
         {
             this.ReadSettings(e.NewPackage.Settings, true);
         }

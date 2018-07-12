@@ -56,6 +56,7 @@ namespace iRentCar.FrontEnd.Controllers
         }
 
 
+        [HttpGet("{plate}")]
         public async Task<ActionResult> Details(string plate)
         {
             var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
@@ -85,9 +86,9 @@ namespace iRentCar.FrontEnd.Controllers
         }
 
         // POST: Vehicles/Create
-        [HttpPost]
+        [HttpPut]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Reserve(string plate, VehicleInfoForReserveDto reservation)
+        public async Task<ActionResult> Reserve(string plate, [FromBody] VehicleInfoForReserveDto reservation)
         {
             if (!ModelState.IsValid)
                 return View();
@@ -112,34 +113,27 @@ namespace iRentCar.FrontEnd.Controllers
                 return View();
             }
 
-            var userProxy = this.actorFactory.Create<IUserActor>(new ActorId(reservation.Customer),
-                       new Uri(UriConstants.VehicleActorUri));
 
-            var result = await userProxy.RentVehicleAsync(new UserActor.Interfaces.RentInfo()
-            {
-                Plate = reservation.Plate,
-                DailyCost = vehicleInfo.DailyCost,
-                StartRent = reservation.StartReservation,
-                EndRent = reservation.EndReservation
-            }, default(CancellationToken));
-
-            if (result == UserActorError.Ok)
+            var result= await vehicleProxy.ReserveAsync(reservation.Customer, reservation.StartReservation, 
+                reservation.EndReservation, default(CancellationToken));
+            
+            if (result == VehicleActorError.Ok)
                 return RedirectToAction(nameof(Index));
 
             switch (result)
             {
-                case UserActorError.Ok:
+                case VehicleActorError.Ok:
                     break;
-                case UserActorError.UserNotValid:
-                    ModelState.AddModelError("", "L'utente non è valido o non è registrato");
+                case VehicleActorError.ReservationDatesWrong:
+                    ModelState.AddModelError("", "Le date di prenotazione sono errate");
                     break;
-                case UserActorError.VehicleAlreadyRented:
-                    ModelState.AddModelError("", "L'utente ha già un'autovettura assegnata");
+                case VehicleActorError.VehicleBusy:
+                    ModelState.AddModelError("", "L'autovettura non può essere assegnata");
                     break;
-                case UserActorError.VehicleNotRented:
+                case VehicleActorError.VehicleNotAvailable:
                     ModelState.AddModelError("", "Il veicolo non è prenotabile");
                     break;
-                case UserActorError.GenericError:
+                case VehicleActorError.GenericError:
                     ModelState.AddModelError("", "Si è verificato un errore nella procedura di prenotazione");
                     break;
                 default:

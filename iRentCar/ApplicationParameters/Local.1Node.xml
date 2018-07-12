@@ -10,13 +10,15 @@
     <Parameter Name="UserActor_PartitionCount" Value="1" />
     <Parameter Name="UserActor_TargetReplicaSetSize" Value="1" />
     <Parameter Name="UserActor_MinReplicaSetSize" Value="1" />
+    <Parameter Name="MailService_DelayBetweenMailSend" Value="00:00:10" />
+    <Parameter Name="SendGridAdapter_SendMailUri" Value="https://api.sendgrid.com/v3/mail/send" />
+    <Parameter Name="MailService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="MailService_TargetReplicaSetSize" Value="1" />
     <Parameter Name="VehicleActor_PartitionCount" Value="1" />
     <Parameter Name="VehicleActor_TargetReplicaSetSize" Value="1" />
     <Parameter Name="VehicleActor_MinReplicaSetSize" Value="1" />
     <Parameter Name="InvoiceActor_PartitionCount" Value="1" />
     <Parameter Name="InvoiceActor_TargetReplicaSetSize" Value="1" />
     <Parameter Name="InvoiceActor_MinReplicaSetSize" Value="1" />
-    <Parameter Name="MailService_MinReplicaSetSize" Value="1" />
-    <Parameter Name="MailService_TargetReplicaSetSize" Value="1" />
   </Parameters>
 </Application>

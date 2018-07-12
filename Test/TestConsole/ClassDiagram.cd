@@ -14,10 +14,6 @@
     <Position X="3.75" Y="3.75" Width="2" />
     <TypeIdentifier />
   </Class>
-  <Class Name="Microsoft.ServiceFabric.Actors.ActorIdKind">
-    <Position X="6.5" Y="3.75" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
   <Class Name="System.Fabric.FabricClient">
     <Position X="0.75" Y="9.5" Width="4.25" />
     <Compartments>
@@ -55,11 +51,6 @@
         <TypeIdentifier />
       </Class>
       <Class Name="System.Fabric.FabricClient.ServiceManagementClient" Collapsed="true">
-        <NestedTypes>
-          <Class Name="System.Fabric.FabricClient.ServiceManagementClient.ServiceNotificationEventArgs" Collapsed="true">
-            <TypeIdentifier />
-          </Class>
-        </NestedTypes>
         <TypeIdentifier />
       </Class>
       <Class Name="System.Fabric.FabricClient.GatewayInformationEventArgs" Collapsed="true">
@@ -80,8 +71,29 @@
     </NestedTypes>
     <TypeIdentifier />
   </Class>
+  <Class Name="Microsoft.ServiceFabric.Actors.ActorIdKind">
+    <Position X="6.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="System.Fabric.StatefulServiceContext">
+    <Position X="7" Y="17" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="System.Fabric.ServiceContext">
+    <Position X="6.75" Y="19" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
   <Interface Name="Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager">
     <Position X="7.5" Y="5.75" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="System.Fabric.ICodePackageActivationContext">
+    <Position X="10" Y="19.25" Width="3.75" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier />
   </Interface>
   <Font Name="Segoe UI" Size="8.25" />
