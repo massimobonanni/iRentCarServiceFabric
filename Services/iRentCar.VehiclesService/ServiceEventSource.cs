@@ -4,7 +4,7 @@ using System.Fabric;
 
 namespace iRentCar.VehiclesService
 {
-    [EventSource(Name = "iRentCar-VehiclesService")]
+    [EventSource(Name = "iRentCar.VehiclesService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

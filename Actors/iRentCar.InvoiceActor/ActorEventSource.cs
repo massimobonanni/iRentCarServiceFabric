@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace iRentCar.InvoiceActor
 {
-    [EventSource(Name = "MyCompany-iRentCar-iRentCar.InvoiceActor")]
+    [EventSource(Name = "iRentCar.InvoiceActor")]
     internal sealed class ActorEventSource : EventSource
     {
         public static readonly ActorEventSource Current = new ActorEventSource();

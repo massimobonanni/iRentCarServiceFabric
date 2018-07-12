@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace iRentCar.MailService
 {
-    [EventSource(Name = "MyCompany-iRentCar-iRentCar.MailService")]
+    [EventSource(Name = "iRentCar.MailService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

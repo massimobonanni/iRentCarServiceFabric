@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace iRentCar.PaymentGateway
 {
-    [EventSource(Name = "MyCompany-iRentCar-iRentCar.PaymentGateway")]
+    [EventSource(Name = "iRentCar.PaymentGateway")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
