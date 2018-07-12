@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,38 @@ namespace TestConsole.Commands
                 }
             }
             return result;
+        }
+
+        protected void WriteError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        protected void WriteWarning(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        protected void WriteSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        protected void WriteMessage(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        protected void WriteJson(object obj)
+        {
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            Console.WriteLine(json);
         }
     }
 }

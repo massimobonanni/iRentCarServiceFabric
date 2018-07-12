@@ -20,7 +20,9 @@ namespace TestConsole
     {
         private static Dictionary<string, CommandBase> commands = new Dictionary<string, CommandBase>()
         {
-            { "reserve" , new ReserveVehicleCommand()}
+            { "reserve" , new ReserveVehicleCommand()},
+            { "searchVehicles" , new SearchVeiclesCommand()},
+            { "userInfo" , new UserInfoCommand()}
         };
 
         static void Main(string[] args)
@@ -34,7 +36,15 @@ namespace TestConsole
                 return;
 
             var commandName = args[0];
-            if (commands.ContainsKey(commandName))
+            if (commandName == "-h")
+            {
+                Console.WriteLine("Commands:");
+                foreach (var command in commands.Keys)
+                {
+                    Console.WriteLine($"\t{command}");
+                }
+            }
+            else  if (commands.ContainsKey(commandName))
             {
                 var command = commands[commandName];
                 if (args.Any(a => a == "-h"))
@@ -48,7 +58,9 @@ namespace TestConsole
             }
             else
             {
-                Console.WriteLine("Comando non riconosciuto!");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("command unknown!");
+                Console.ResetColor();
             }
 
 

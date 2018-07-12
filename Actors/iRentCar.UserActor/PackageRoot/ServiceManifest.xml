@@ -3,7 +3,7 @@
   <ServiceTypes>
     <StatefulServiceType ServiceTypeName="UserActorType" HasPersistedState="true">
       <Extensions>
-        <Extension Name="__GeneratedServiceType__" GeneratedId="b2d72648-e3df-4284-8b13-878c176e34ca|Persisted">
+        <Extension Name="__GeneratedServiceType__" GeneratedId="6f62fe1e-46dc-4815-afc9-6986a764937e|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="UserActor" />
             <ReplicatorEndpoint Name="UserActorReplicatorEndpoint" />
@@ -26,8 +26,8 @@
   <ConfigPackage Name="Config" Version="1.0.0" />
   <Resources>
     <Endpoints>
-      <Endpoint Name="UserActorServiceEndpointV2" />
       <Endpoint Name="UserActorEndpointV2" />
+      <Endpoint Name="UserActorServiceEndpointV2" />
       <Endpoint Name="UserActorReplicatorEndpoint" />
     </Endpoints>
   </Resources>

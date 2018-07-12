@@ -17,46 +17,49 @@ namespace TestConsole.Commands
         private DateTime startDate;
         private DateTime endDate;
 
+
+
         public override Task<bool> ParseArgumentsAsync(IEnumerable<string> args)
         {
             bool result = true;
             if (!GetValue<string>(args, "plate", ref plate))
             {
-                Console.WriteLine("L'argomento -plate è obbligatorio");
+                
+               this.WriteError("The argument '-plate' is mandatory");
                 result = false;
             }
 
             if (!GetValue<string>(args, "user", ref username ))
             {
-                Console.WriteLine("L'argomento -user è obbligatorio");
+                this.WriteError("The argument '-user' is mandatory");
                 result = false;
             }
 
             string strDate=null;
             if (!GetValue<string>(args, "startDate", ref strDate))
             {
-                Console.WriteLine("L'argomento -startDate è obbligatorio");
+                this.WriteError("The argument '-startDate' is mandatory");
                 result = false;
             }
             else
             {
                 if (!DateTime.TryParse(strDate, out startDate))
                 {
-                    Console.WriteLine("L'argomento -startDate non è valido");
+                    this.WriteError("The argument '-startDate' is not valid");
                     result = false;
                 }
             }
 
             if (!GetValue<string>(args, "endDate", ref strDate))
             {
-                Console.WriteLine("L'argomento -endDate è obbligatorio");
+                this.WriteError("The argument '-endDate' is mandatory");
                 result = false;
             }
             else
             {
                 if (!DateTime.TryParse(strDate, out endDate))
                 {
-                    Console.WriteLine("L'argomento -endDate non è valido");
+                    this.WriteError("The argument '-endDate' is not valid");
                     result = false;
                 }
             }
@@ -79,8 +82,8 @@ namespace TestConsole.Commands
         {
             Console.WriteLine("-plate = vehicle plate to reserve");
             Console.WriteLine("-user = user name reserve to");
-            Console.WriteLine("-startDate = start date of reservation (yyyymmddHHmm)");
-            Console.WriteLine("-endDate = end date of reservation (yyyymmddHHmm)");
+            Console.WriteLine("-startDate = start date of reservation (yyyy-MM-dd HH:mm:ss)");
+            Console.WriteLine("-endDate = end date of reservation (yyyy-MM-dd HH:mm:ss)");
             Console.WriteLine();
 
         }

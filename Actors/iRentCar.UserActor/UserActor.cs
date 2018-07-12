@@ -27,7 +27,7 @@ namespace iRentCar.UserActor
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
     [ActorService(Name = "UserActor")]
-    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IInvoiceCallbackActor, IRemindable
+    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable,IInvoiceCallbackActor
     {
         public UserActor(ActorService actorService, ActorId actorId)
             : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
@@ -152,6 +152,16 @@ namespace iRentCar.UserActor
 
         #endregion [ StateManager accessor ]
 
+        #region [ Internal methods ]
+        private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var userData = await GetUserDataFromStateAsync(default(CancellationToken));
+            if (userData == null)
+                ReportHealthForUserUnknown();
+            return userData != null;
+        }
+        #endregion [ Internal Methods ]
+
         #region [ Diagnostics ]
         private void ReportHealthForUserUnknown()
         {
@@ -160,14 +170,6 @@ namespace iRentCar.UserActor
         #endregion [ Diagnostics ]
 
         #region [ IUserActor interface ]
-        private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var userData = await GetUserDataFromStateAsync(default(CancellationToken));
-            if (userData == null)
-                ReportHealthForUserUnknown();
-            return userData != null;
-        }
-
         public async Task<UserActorError> RentVehicleAsync(RentInfo rentInfo, CancellationToken cancellationToken)
         {
             if (rentInfo == null)

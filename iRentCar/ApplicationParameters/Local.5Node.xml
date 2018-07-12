@@ -2,8 +2,8 @@
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/iRentCar" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="VehiclesService_PartitionCount" Value="5" />
-    <Parameter Name="UserActor_PartitionCount" Value="5" />
     <Parameter Name="VehicleActor_PartitionCount" Value="5" />
     <Parameter Name="InvoiceActor_PartitionCount" Value="1" />
+    <Parameter Name="UserActor_PartitionCount" Value="1" />
   </Parameters>
 </Application>

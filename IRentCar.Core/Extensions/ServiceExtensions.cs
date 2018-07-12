@@ -12,7 +12,7 @@ namespace Microsoft.ServiceFabric.Services.Runtime
         {
             if (service == null)
                 throw new NullReferenceException(nameof(service));
-
+            
             HealthInformation healthInformation = new HealthInformation(service.Context.ServiceName.ToString()
                 , property, state);
             healthInformation.Description = description;

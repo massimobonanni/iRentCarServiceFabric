@@ -9,9 +9,6 @@
     <Parameter Name="VehiclesService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="FrontEnd_InstanceCount" DefaultValue="-1" />
     <Parameter Name="PaymentGateway_InstanceCount" DefaultValue="1" />
-    <Parameter Name="UserActor_PartitionCount" DefaultValue="10" />
-    <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="2" />
-    <Parameter Name="UserActor_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="VehicleActor_PartitionCount" DefaultValue="10" />
     <Parameter Name="VehicleActor_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="VehicleActor_TargetReplicaSetSize" DefaultValue="3" />
@@ -25,6 +22,9 @@
     <Parameter Name="SendGridAdapter_SendMailUri" DefaultValue="https://api.sendgrid.com/v3/mail/send" />
     <Parameter Name="SendGridAdapter_ApiKey" DefaultValue="" />
     <Parameter Name="SendGridAdapter_FromAddress" DefaultValue="info@irentcar.com" />
+    <Parameter Name="UserActor_PartitionCount" DefaultValue="10" />
+    <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="UserActor_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -89,11 +89,6 @@
         <SingletonPartition />
       </StatelessService>
     </Service>
-    <Service Name="UserActor" GeneratedIdRef="b2d72648-e3df-4284-8b13-878c176e34ca|Persisted">
-      <StatefulService ServiceTypeName="UserActorType" TargetReplicaSetSize="[UserActor_TargetReplicaSetSize]" MinReplicaSetSize="[UserActor_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[UserActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-      </StatefulService>
-    </Service>
     <Service Name="VehicleActor" GeneratedIdRef="c4d5c41d-5db1-4d07-8c79-ac00bd7515ba|Persisted">
       <StatefulService ServiceTypeName="VehicleActorType" TargetReplicaSetSize="[VehicleActor_TargetReplicaSetSize]" MinReplicaSetSize="[VehicleActor_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[VehicleActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
@@ -107,6 +102,11 @@
     <Service Name="MailService">
       <StatefulService ServiceTypeName="MailServiceType" TargetReplicaSetSize="[MailService_TargetReplicaSetSize]" MinReplicaSetSize="[MailService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[MailService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="UserActor" GeneratedIdRef="6f62fe1e-46dc-4815-afc9-6986a764937e|Persisted">
+      <StatefulService ServiceTypeName="UserActorType" TargetReplicaSetSize="[UserActor_TargetReplicaSetSize]" MinReplicaSetSize="[UserActor_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[UserActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
     <!-- The section below creates instances of service types, when an instance of this 

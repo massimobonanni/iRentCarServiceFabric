@@ -82,7 +82,7 @@ namespace iRentCar.MailService
             mailQueue = await this.StateManager.GetOrAddAsync<IReliableQueue<MailData>>(MailQueueName);
 
             ConfigureService();
-
+            
             List<Task> taskList = new List<Task>();
 
             taskList.Add(SendMailTaskCode(cancellationToken));

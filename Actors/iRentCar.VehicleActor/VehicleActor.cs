@@ -120,14 +120,17 @@ namespace iRentCar.VehicleActor
             if (startReservation >= endReservation)
                 return VehicleActorError.ReservationDatesWrong;
 
+            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+            if (info == null)
+                return VehicleActorError.VehicleNotExists;
+
             var currentState = await GetVehicleStateFromStateAsync(cancellationToken);
 
             if (currentState == VehicleActorInterface.VehicleState.Busy)
                 return VehicleActorError.VehicleBusy;
             if (currentState == VehicleActorInterface.VehicleState.Busy)
                 return VehicleActorError.VehicleNotAvailable;
-
-            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+                       
 
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
                 UriConstants.UserActorUri);
