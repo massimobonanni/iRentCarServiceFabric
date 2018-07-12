@@ -13,11 +13,11 @@ namespace iRentCar.MailService.Interfaces
         [DataMember]
         public string From { get; set; }
         [DataMember]
-        public List<string> TOAddresses { get; set; }
+        public List<string> TOAddresses { get; set; } = new List<string>();
         [DataMember]
-        public List<string> CCAddresses { get; set; }
+        public List<string> CCAddresses { get; set; } = new List<string>();
         [DataMember]
-        public List<string> BccAddresses { get; set; }
+        public List<string> BccAddresses { get; set; } = new List<string>();
 
         [DataMember]
         public string Subject { get; set; }

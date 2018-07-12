@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,6 +11,7 @@
     <FabActUtilWorkingDir>$(BaseIntermediateOutputPath)\FabActUtilTemp</FabActUtilWorkingDir>
     <RootNamespace>iRentCar.UserActor</RootNamespace>
     <AssemblyName>iRentCar.UserActor</AssemblyName>
+    <TargetLatestRuntimePatch>false</TargetLatestRuntimePatch>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.InvoicesService.Interfaces\iRentCar.InvoicesService.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj" />
     <ProjectReference Include="..\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
     <ProjectReference Include="..\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
   </ItemGroup>

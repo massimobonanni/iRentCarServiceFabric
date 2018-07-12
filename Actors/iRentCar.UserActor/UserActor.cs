@@ -14,6 +14,7 @@ using iRentCar.UserActor.Interfaces;
 using System.Fabric.Health;
 using System.Fabric;
 using iRentCar.InvoiceActor.Interfaces;
+using iRentCar.MailService.Interfaces;
 
 namespace iRentCar.UserActor
 {
@@ -27,7 +28,7 @@ namespace iRentCar.UserActor
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
     [ActorService(Name = "UserActor")]
-    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable,IInvoiceCallbackActor
+    internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable, IInvoiceCallbackActor
     {
         public UserActor(ActorService actorService, ActorId actorId)
             : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
@@ -159,6 +160,26 @@ namespace iRentCar.UserActor
             if (userData == null)
                 ReportHealthForUserUnknown();
             return userData != null;
+        }
+
+        private async Task SendReminderMail()
+        {
+            var userInfo = await this.GetUserDataFromStateAsync(default(CancellationToken));
+            if (userInfo != null)
+            {
+                var mail = new MailInfo()
+                {
+                    Subject = $"Your rent reminder!",
+                    Body = $"Hi {userInfo.FirstName},<br/>you rent was expired!"
+                };
+                mail.TOAddresses.Add(userInfo.Email);
+
+                try
+                {
+                    await MailServiceProxy.Instance.SendMailAsync(mail, null, default(CancellationToken));
+                }
+                catch { }
+            }
         }
         #endregion [ Internal Methods ]
 
@@ -297,6 +318,7 @@ namespace iRentCar.UserActor
         #region [ Reminder ]  
 
         private const string EndTimeExpiredReminderName = "EndTimeExpiredReminderName";
+
         public async Task ReceiveReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)
         {
             if (reminderName == EndTimeExpiredReminderName)
@@ -309,7 +331,7 @@ namespace iRentCar.UserActor
                         var userInfo = await this.GetUserDataFromStateAsync();
                         if (!string.IsNullOrWhiteSpace(userInfo.Email))
                         {
-                            //TODO invio mail!!!
+                            await SendReminderMail();
 
                             var reminder = this.GetReminder(reminderName);
                             await this.UnregisterReminderAsync(reminder);

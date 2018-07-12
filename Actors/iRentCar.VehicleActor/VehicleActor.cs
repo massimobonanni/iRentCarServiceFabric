@@ -133,7 +133,7 @@ namespace iRentCar.VehicleActor
                        
 
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
-                UriConstants.UserActorUri);
+                new Uri(UriConstants.UserActorUri));
 
             var response = await actorProxy.RentVehicleAsync(new UserActorInterfaces.RentInfo()
             {
@@ -169,7 +169,7 @@ namespace iRentCar.VehicleActor
                 return VehicleActorError.GenericError;
 
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(currentRentInfo.User),
-                UriConstants.UserActorUri);
+                new Uri(UriConstants.UserActorUri));
 
             var response = await actorProxy.ReleaseVehicleAsync(cancellationToken);
 

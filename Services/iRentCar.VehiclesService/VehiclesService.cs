@@ -64,13 +64,8 @@ namespace iRentCar.VehiclesService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
+            ServiceEventSource.Current.Message($"{this.GetType().Name}.RunAsync");
             await LoadVehiclesDictionaryAsync(cancellationToken);
-
-            this.Partition.ReportLoad(new List<LoadMetric> {
-                new LoadMetric("CurrentConnectionCount", 1234),
-                new LoadMetric("metric1", 42) });
-
-
 
             while (true)
             {
@@ -180,6 +175,7 @@ namespace iRentCar.VehiclesService
                     newVehicle.State = newState;
                     await this.vehiclesDictionary.SetAsync(tx, plate, newVehicle, TimeSpan.FromSeconds(5),
                         cancellationToken);
+                    await tx.CommitAsync();
                     result = true;
                 }
             }
