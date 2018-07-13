@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace TestConsole.Commands
 {
@@ -42,9 +43,17 @@ namespace TestConsole.Commands
         public override async Task ExecuteAsync(IEnumerable<string> args)
         {
             var response = await VehiclesServiceProxy.Instance.SearchVehiclesAsync(plateFilter, modelFilter, brandFilter, null, default(CancellationToken));
+            var totalItems = response.Count();
             var vehicles = response.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var result = new VehicleSearchResult(vehicles, totalItems, this.pageNumber, pageSize)
+            {
+                BrandFilter = this.brandFilter,
+                ModelFilter = this.modelFilter,
+                PlateFilter = this.plateFilter,
+                StateFilter = null
+            };
             WriteSuccess($"Search result:");
-            WriteJson(vehicles);
+            WriteJson(result);
             WriteMessage(null);
         }
 
@@ -60,5 +69,38 @@ namespace TestConsole.Commands
             WriteMessage(null);
 
         }
+    }
+
+    public class VehicleSearchResult 
+    {
+        public VehicleSearchResult(IEnumerable<iRentCar.VehiclesService.Interfaces.VehicleInfo> items, int count, int pageIndex, int pageSize)
+        {
+            PageIndex = pageIndex;
+            TotalItems = count;
+            if (pageSize == 0)
+                TotalPages = 1;
+            else
+                TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+
+            this.Vehicles.AddRange(items);
+        }
+
+        public List<iRentCar.VehiclesService.Interfaces.VehicleInfo> Vehicles { get; set; } =
+            new List<iRentCar.VehiclesService.Interfaces.VehicleInfo>();
+
+        public int PageIndex { get; private set; }
+        public int TotalPages { get; private set; }
+
+        public int TotalItems { get; private set; }
+
+        public bool HasPreviousPage => (PageIndex >= 1);
+
+        public bool HasNextPage => (PageIndex < TotalPages - 1);
+
+        public string BrandFilter { get; set; }
+        public string ModelFilter { get; set; }
+        public string PlateFilter { get; set; }
+        public iRentCar.VehiclesService.Interfaces.VehicleState? StateFilter { get; set; }
+
     }
 }
