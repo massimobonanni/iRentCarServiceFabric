@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +23,10 @@
     <ProjectReference Include="..\..\Services\iRentCar.InvoicesService.Interfaces\iRentCar.InvoicesService.Interfaces.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.VehiclesSerive.Interfaces\iRentCar.VehiclesService.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Documentation\Images\" />
   </ItemGroup>
 
 </Project>
