@@ -20,40 +20,30 @@ namespace iRentCar.MailService
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class MailService : StatefulService, IMailService
+    internal sealed class MailService : Core.Implementations.StatefulServiceBase, IMailService
     {
-        public MailService(StatefulServiceContext context, MailAdapterBase mailAdapter, IActorFactory actorFactory = null)
-            : base(context)
+        public MailService(StatefulServiceContext context, MailAdapterBase mailAdapter,
+            IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+            : base(context, actorFactory, serviceFactory)
         {
             if (mailAdapter == null)
                 throw new ArgumentNullException(nameof(mailAdapter));
-
-            if (actorFactory == null)
-                this.actorFactory = new ReliableFactory();
-            else
-                this.actorFactory = actorFactory;
 
             this.mailAdapter = mailAdapter;
             this.mailAdapter.SetParent(this);
         }
 
         public MailService(StatefulServiceContext context, IReliableStateManagerReplica stateManager,
-            MailAdapterBase mailAdapter, IActorFactory actorFactory = null)
-            : base(context, stateManager)
+            MailAdapterBase mailAdapter, IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+            : base(context, stateManager, actorFactory, serviceFactory)
         {
             if (mailAdapter == null)
                 throw new ArgumentNullException(nameof(mailAdapter));
-
-            if (actorFactory == null)
-                this.actorFactory = new ReliableFactory();
-            else
-                this.actorFactory = actorFactory;
 
             this.mailAdapter = mailAdapter;
             this.mailAdapter.SetParent(this);
         }
 
-        private readonly IActorFactory actorFactory;
         private readonly MailAdapterBase mailAdapter;
 
 
@@ -82,7 +72,7 @@ namespace iRentCar.MailService
             mailQueue = await this.StateManager.GetOrAddAsync<IReliableQueue<MailData>>(MailQueueName);
 
             ConfigureService();
-            
+
             List<Task> taskList = new List<Task>();
 
             taskList.Add(SendMailTaskCode(cancellationToken));
@@ -114,7 +104,7 @@ namespace iRentCar.MailService
                 this.ConfigurationPackageModifiedEvent;
         }
 
-        private void ConfigurationPackageModifiedEvent(object sender, 
+        private void ConfigurationPackageModifiedEvent(object sender,
             PackageModifiedEventArgs<ConfigurationPackage> e)
         {
             this.ReadSettings(e.NewPackage.Settings, true);

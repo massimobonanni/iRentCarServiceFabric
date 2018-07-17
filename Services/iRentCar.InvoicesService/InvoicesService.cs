@@ -4,7 +4,11 @@ using System.Fabric;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using iRentCar.Core;
+using iRentCar.Core.Interfaces;
+using iRentCar.InvoiceActor.Interfaces;
 using iRentCar.InvoicesService.Interfaces;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -16,19 +20,21 @@ namespace iRentCar.InvoicesService
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class InvoicesService : StatefulService, IInvoicesService
+    internal sealed class InvoicesService : Core.Implementations.StatefulServiceBase, IInvoicesService
     {
-        public InvoicesService(StatefulServiceContext context)
-            : base(context)
+        public InvoicesService(StatefulServiceContext context,
+            IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+            : base(context, actorFactory, serviceFactory)
         { }
 
-        public InvoicesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager)
-            : base(context, stateManager)
+        public InvoicesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager,
+                        IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+            : base(context, stateManager, actorFactory, serviceFactory)
         { }
 
         private IReliableDictionary<string, uint> invoiceNumbersDictionary;
 
-        private const string InvoiceNumbersDictionaryKeyName = "InvoiceNumbersDictionaryKeyName";
+        internal const string InvoiceNumbersDictionaryKeyName = "InvoiceNumbersDictionaryKeyName";
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -49,8 +55,7 @@ namespace iRentCar.InvoicesService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-
-            invoiceNumbersDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, uint>>(InvoiceNumbersDictionaryKeyName);
+            await InitializeInvoiceNumbersDictionaryAsync();
 
             while (true)
             {
@@ -60,8 +65,14 @@ namespace iRentCar.InvoicesService
             }
         }
 
+        private async Task InitializeInvoiceNumbersDictionaryAsync()
+        {
+            if (this.invoiceNumbersDictionary == null)
+                invoiceNumbersDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, uint>>(InvoiceNumbersDictionaryKeyName);
+        }
+
         #region [ IInvoicesService interface ]
-        public async Task<InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount,
+        public async Task<Interfaces.InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount,
             DateTime releaseDate, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(customer))
@@ -69,6 +80,9 @@ namespace iRentCar.InvoicesService
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
+            await InitializeInvoiceNumbersDictionaryAsync();
+
+            Interfaces.InvoiceInfo invoice = null;
 
             uint invoiceNumber = 0;
             string yearKey = releaseDate.Year.ToString();
@@ -77,21 +91,32 @@ namespace iRentCar.InvoicesService
                 invoiceNumber = await this.invoiceNumbersDictionary.GetOrAddAsync(tx,
                     yearKey, 0, TimeSpan.FromSeconds(5), cancellationToken);
                 invoiceNumber++;
+
                 await this.invoiceNumbersDictionary.SetAsync(tx, yearKey, invoiceNumber);
-                await tx.CommitAsync();
+
+                // TODO: creazione della fattura come attore e inizializzazione!!!
+                var invoiceNumberComplete = $"{yearKey}/{invoiceNumber}";
+
+                var invoiceActor = this.actorFactory.Create<IInvoiceActor>(new ActorId(invoiceNumberComplete),
+                    new Uri(UriConstants.InvoiceActorUri));
+
+                var creationResult = await invoiceActor.CreateAsync(customer, amount, releaseDate,
+                    UriConstants.UserActorUri, cancellationToken);
+
+                if (creationResult == InvoiceActorError.Ok)
+                {
+                    invoice = new Interfaces.InvoiceInfo()
+                    {
+                        Amount = amount,
+                        Customer = customer,
+                        InvoiceNumber = invoiceNumberComplete,
+                        ReleaseDate = releaseDate,
+                        State = Interfaces.InvoiceState.NotPaid
+                    };
+                    await tx.CommitAsync();
+                }
             }
-
-            // TODO: creazione della fattura come attore e inizializzazione!!!
-            var invoiceNumberComplete = $"{yearKey}/{invoiceNumber}";
-
-            return new InvoiceInfo()
-            {
-                Amount = amount,
-                Customer = customer,
-                InvoiceNumber = invoiceNumberComplete,
-                ReleaseDate = releaseDate,
-                State = InvoiceState.NotPaid
-            };
+            return invoice;
         }
         #endregion [ IInvoicesService interface ]
     }

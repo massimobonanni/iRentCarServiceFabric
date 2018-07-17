@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Actors\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
     <ProjectReference Include="..\iRentCar.InvoicesService.Interfaces\iRentCar.InvoicesService.Interfaces.csproj" />
   </ItemGroup>
 
