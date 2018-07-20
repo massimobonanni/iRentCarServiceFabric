@@ -1,0 +1,9 @@
+﻿dotnet testconsole.dll unreserve -plate=AM231PH 
+
+dotnet testconsole.dll userInfo -user="massimo.bonanni"
+
+dotnet testconsole.dll vehicleInfo -plate=AM231PH
+
+dotnet testconsole.dll reserve -plate=AM231PH -user="massimo.bonanni" -startDate="2018-07-20 10:00:00" -endDate="2018-07-20 13:00:00"
+
+dotnet testconsole.dll searchVehicles

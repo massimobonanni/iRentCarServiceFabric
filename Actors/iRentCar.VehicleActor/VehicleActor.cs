@@ -130,7 +130,7 @@ namespace iRentCar.VehicleActor
                 return VehicleActorError.VehicleBusy;
             if (currentState == VehicleActorInterface.VehicleState.Busy)
                 return VehicleActorError.VehicleNotAvailable;
-                       
+
 
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
                 new Uri(UriConstants.UserActorUri));
@@ -157,19 +157,19 @@ namespace iRentCar.VehicleActor
 
         public async Task<VehicleActorError> UnreserveAsync(CancellationToken cancellationToken)
         {
+            var currentRentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
+            if (currentRentInfo == null)
+                return VehicleActorError.VehicleNotExists;
+
             var currentState = await GetVehicleStateFromStateAsync(cancellationToken);
 
             if (currentState == VehicleActorInterface.VehicleState.Free)
                 return VehicleActorError.VehicleFree;
-            if (currentState == VehicleActorInterface.VehicleState.Free)
+            if (currentState == VehicleActorInterface.VehicleState.NotAvailable)
                 return VehicleActorError.VehicleNotAvailable;
 
-            var currentRentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
-            if (currentRentInfo == null)
-                return VehicleActorError.GenericError;
-
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(currentRentInfo.User),
-                new Uri(UriConstants.UserActorUri));
+                        new Uri(UriConstants.UserActorUri));
 
             var response = await actorProxy.ReleaseVehicleAsync(cancellationToken);
 
@@ -187,10 +187,13 @@ namespace iRentCar.VehicleActor
         public async Task<VehicleActorInterface.VehicleInfo> GetInfoAsync(CancellationToken cancellationToken)
         {
             var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+            if (info == null)
+                return null;
+
             var state = await GetVehicleStateFromStateAsync(cancellationToken);
             var rentInfo = await GetCurrentRentInfoFromStateAsync(cancellationToken);
 
-            var response = info.ToInterfacesInfo();
+            VehicleActorInterface.VehicleInfo response = info.ToInterfacesInfo();
             response.Plate = this.Id.ToString();
             response.State = state;
             response.CurrentRent = rentInfo;

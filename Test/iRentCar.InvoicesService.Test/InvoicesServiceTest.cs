@@ -109,6 +109,42 @@ namespace iRentCar.InvoicesService.Test
             Assert.AreEqual(currentInvoiceNumber, newInvoiceNumber.Value);
 
         }
+
+        [TestMethod]
+        public async Task GenerateInvoiceAsync_InvoiceNotExist_ReturnInvoice()
+        {
+            string customer = "testUser";
+            decimal amount = 100M;
+            DateTime releaseDate = DateTime.Now;
+
+            var context = MockStatefulServiceContextFactory.Default;
+            var stateManager = new MockReliableStateManager();
+            var actorFactory = new Mock<IActorFactory>();
+            var invoiceActor = new Mock<IInvoiceActor>();
+
+            actorFactory.Setup(f => f.Create<IInvoiceActor>(It.IsAny<ActorId>(), It.Is<Uri>(u => u.AbsoluteUri == UriConstants.InvoiceActorUri), null))
+                .Returns(invoiceActor.Object);
+
+            invoiceActor.Setup(i => i.CreateAsync(customer, amount, releaseDate, UriConstants.UserActorUri, It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(InvoiceActorError.Ok));
+
+
+            var yearKey = releaseDate.Year.ToString();
+            uint currentInvoiceNumber = 10;
+            await SetInvoiceNumberInDictionaryAsync(stateManager, yearKey, currentInvoiceNumber);
+
+            var service = new InvoicesService(context, stateManager, actorFactory.Object, null);
+
+            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate, default(CancellationToken));
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(actual.Customer, customer);
+            Assert.AreEqual(actual.Amount , customer);
+
+            uint? newInvoiceNumber = await GetInvoiceNumberInDictionaryAsync(stateManager, yearKey);
+            Assert.AreEqual(currentInvoiceNumber, newInvoiceNumber.Value);
+
+        }
         #endregion [ GenerateInvoiceAsync ]
     }
 }

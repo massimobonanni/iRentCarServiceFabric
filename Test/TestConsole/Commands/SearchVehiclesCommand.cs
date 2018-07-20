@@ -59,7 +59,7 @@ namespace TestConsole.Commands
 
         public override void ShowArguments()
         {
-            WriteMessage("Execute a vehicles search using filters");
+            WriteMessage("Execute a vehicles search using filters.");
             WriteMessage(null);
             WriteMessage("-plate = vehicle plate filter");
             WriteMessage("-model = model filter");

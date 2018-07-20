@@ -17,25 +17,23 @@ namespace TestConsole.Commands
         private DateTime startDate;
         private DateTime endDate;
 
-
-
         public override Task<bool> ParseArgumentsAsync(IEnumerable<string> args)
         {
             bool result = true;
             if (!GetValue<string>(args, "plate", ref plate))
             {
-                
-               this.WriteError("The argument '-plate' is mandatory");
+
+                this.WriteError("The argument '-plate' is mandatory");
                 result = false;
             }
 
-            if (!GetValue<string>(args, "user", ref username ))
+            if (!GetValue<string>(args, "user", ref username))
             {
                 this.WriteError("The argument '-user' is mandatory");
                 result = false;
             }
 
-            string strDate=null;
+            string strDate = null;
             if (!GetValue<string>(args, "startDate", ref strDate))
             {
                 this.WriteError("The argument '-startDate' is mandatory");
@@ -67,19 +65,22 @@ namespace TestConsole.Commands
             return Task.FromResult(result);
         }
 
-        
+
         public override async Task ExecuteAsync(IEnumerable<string> args)
         {
             var actorProxy = ActorProxy.Create<IVehicleActor>(new Microsoft.ServiceFabric.Actors.ActorId(this.plate),
                 new Uri(UriConstants.VehicleActorUri));
 
-            var response = await actorProxy.ReserveAsync(this.username,this.startDate,this.endDate,default(CancellationToken));
+            var response = await actorProxy.ReserveAsync(this.username, this.startDate, this.endDate, default(CancellationToken));
 
             Console.WriteLine($"ReserveAsync --> {response}");
+            WriteMessage(null);
         }
 
         public override void ShowArguments()
         {
+            WriteMessage("Reserves a vehicle for a customer.");
+            WriteMessage(null);
             Console.WriteLine("-plate = vehicle plate to reserve");
             Console.WriteLine("-user = user name reserve to");
             Console.WriteLine("-startDate = start date of reservation (yyyy-MM-dd HH:mm:ss)");

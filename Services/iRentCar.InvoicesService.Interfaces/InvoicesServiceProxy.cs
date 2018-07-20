@@ -25,7 +25,7 @@ namespace iRentCar.InvoicesService.Interfaces
 
         static InvoicesServiceProxy()
         {
-            serviceUri = new Uri(UriConstants.VehiclesServiceUri);
+            serviceUri = new Uri(UriConstants.InvoicesServiceUri);
         }
 
 

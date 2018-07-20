@@ -21,8 +21,11 @@ namespace TestConsole
         private static Dictionary<string, CommandBase> commands = new Dictionary<string, CommandBase>()
         {
             { "reserve" , new ReserveVehicleCommand()},
+            { "unreserve" , new UnreserveVehicleCommand()},
             { "searchVehicles" , new SearchVeiclesCommand()},
-            { "userInfo" , new UserInfoCommand()}
+            { "vehicleInfo" , new VehicleInfoCommand()},
+            { "userInfo" , new UserInfoCommand()},
+            { "invoiceInfo" , new InvoiceInfoCommand()}
         };
 
         static void Main(string[] args)
