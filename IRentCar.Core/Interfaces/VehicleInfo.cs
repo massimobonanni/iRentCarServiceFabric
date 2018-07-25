@@ -14,8 +14,7 @@ namespace iRentCar.Core.Interfaces
         {
             get
             {
-                var fullkey = $"{Brand}-{Model}";
-                return fullkey.GetExtendedHash();
+                return Plate.GetExtendedHash();
             }
         }
 

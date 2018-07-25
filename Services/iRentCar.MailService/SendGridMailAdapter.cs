@@ -61,7 +61,7 @@ namespace iRentCar.MailService
             else
             {
                 this.parent.ReportHealthInformation(ConfigurationHealthPropertyName,
-                    "Configuration section 'NetSmtpClient' not exists!", System.Fabric.Health.HealthState.Error);
+                    "Configuration section 'SendGridAdapter' not exists!", System.Fabric.Health.HealthState.Error);
             }
         }
 

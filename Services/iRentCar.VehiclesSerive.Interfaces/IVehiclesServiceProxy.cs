@@ -12,5 +12,7 @@ namespace iRentCar.VehiclesService.Interfaces
         Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken);
 
         Task<bool> UpdateVehicleStateAsync(string plate, VehicleState newState, CancellationToken cancellationToken);
+
+        Task<bool> AddOrUpdateVehicleAsync(VehicleInfo vehicle, CancellationToken cancellationToken);
     }
 }

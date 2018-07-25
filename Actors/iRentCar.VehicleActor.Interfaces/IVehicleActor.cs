@@ -18,5 +18,7 @@ namespace iRentCar.VehicleActor.Interfaces
         Task<VehicleActorError> UnreserveAsync(CancellationToken cancellationToken);
 
         Task<VehicleInfo> GetInfoAsync(CancellationToken cancellationToken);
+
+        Task<VehicleActorError> UpdateVehicleInfoAsync(VehicleInfo info, CancellationToken cancellationToken);
     }
 }

@@ -107,7 +107,6 @@ namespace iRentCar.InvoicesService.Test
             Assert.IsNull(actual);
             uint? newInvoiceNumber = await GetInvoiceNumberInDictionaryAsync(stateManager, yearKey);
             Assert.AreEqual(currentInvoiceNumber, newInvoiceNumber.Value);
-
         }
 
         [TestMethod]
@@ -139,10 +138,10 @@ namespace iRentCar.InvoicesService.Test
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(actual.Customer, customer);
-            Assert.AreEqual(actual.Amount , customer);
+            Assert.AreEqual(actual.Amount , amount);
 
             uint? newInvoiceNumber = await GetInvoiceNumberInDictionaryAsync(stateManager, yearKey);
-            Assert.AreEqual(currentInvoiceNumber, newInvoiceNumber.Value);
+            Assert.AreEqual(currentInvoiceNumber+1, newInvoiceNumber.Value);
 
         }
         #endregion [ GenerateInvoiceAsync ]

@@ -24,7 +24,8 @@ namespace iRentCar.InvoiceActor.Test
                 serviceFactory = new Mock<IServiceFactory>().Object;
             }
            
-            Func<ActorService, ActorId, ActorBase> factory = (service, actorId) => new InvoiceActor(service, id, actorFactory, serviceFactory);
+            Func<ActorService, ActorId, ActorBase> factory = 
+                (service, actorId) => new InvoiceActor(service, id, actorFactory, serviceFactory);
             var svc = MockActorServiceFactory.CreateActorServiceForActor<InvoiceActor>(factory);
             var actor = svc.Activate(id);
             return actor;

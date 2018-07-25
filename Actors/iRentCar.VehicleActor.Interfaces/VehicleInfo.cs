@@ -21,7 +21,9 @@ namespace iRentCar.VehicleActor.Interfaces
 
         public bool IsValid()
         {
-            return !string.IsNullOrWhiteSpace(Model) && !string.IsNullOrWhiteSpace(Brand);
+            return !string.IsNullOrWhiteSpace(Model) && 
+                !string.IsNullOrWhiteSpace(Brand) &&
+                !string.IsNullOrWhiteSpace(Plate);
         }
 
     }

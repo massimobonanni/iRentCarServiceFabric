@@ -65,6 +65,7 @@ namespace iRentCar.VehiclesService.Interfaces
             VehicleState? state, CancellationToken cancellationToken)
         {
             await EnsurePartitionCount();
+            IEnumerable<VehicleInfo> result = null;
             var taskList = new List<Task<List<VehicleInfo>>>();
             try
             {
@@ -74,60 +75,70 @@ namespace iRentCar.VehiclesService.Interfaces
                     var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
                     taskList.Add(proxy.SearchVehiclesAsync(plate, model, brand, state, cancellationToken));
                 }
-                await Task.WhenAll(taskList);
+                var resultLists=await Task.WhenAll(taskList);
+                result = resultLists.SelectMany(t => t).ToList();
             }
             catch (Exception ex)
             {
                 throw;
             }
 
-            var result = taskList.SelectMany(t => t.Result).ToList();
             return result;
         }
 
         public async Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken)
         {
             await EnsurePartitionCount();
-            var taskList = new List<Task<VehicleInfo>>();
+            VehicleInfo result = null;
             try
             {
-                foreach (var partition in partitionInfoList)
-                {
-                    var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                    taskList.Add(proxy.GetVehicleByPlateAsync(plate, cancellationToken));
-                }
-                await Task.WhenAll(taskList);
+                var vehicle = new VehicleInfo() { Plate = plate };
+                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                result = await proxy.GetVehicleByPlateAsync(plate, cancellationToken);
             }
             catch (Exception ex)
             {
                 throw;
             }
 
-            var result = taskList.Select(t => t.Result).FirstOrDefault();
             return result;
         }
 
         public async Task<bool> UpdateVehicleStateAsync(string plate, VehicleState newState, CancellationToken cancellationToken)
         {
             await EnsurePartitionCount();
-            var taskList = new List<Task<bool>>();
+            bool result = false;
             try
             {
-                foreach (var partition in partitionInfoList)
-                {
-                    var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                    taskList.Add(proxy.UpdateVehicleStateAsync(plate, newState, cancellationToken));
-                }
-                await Task.WhenAll(taskList);
+                var vehicle = new VehicleInfo() { Plate = plate };
+                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                result = await proxy.UpdateVehicleStateAsync(plate, newState, cancellationToken);
             }
             catch (Exception ex)
             {
                 throw;
             }
 
-            var result = taskList.Select(t => t.Result).Any(a => a);
+            return result;
+        }
+
+        public async Task<bool> AddOrUpdateVehicleAsync(VehicleInfo vehicle, CancellationToken cancellationToken)
+        {
+            await EnsurePartitionCount();
+            bool result = false;
+            try
+            {
+                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                result = await proxy.AddOrUpdateVehicleAsync(vehicle, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return result;
         }
     }
