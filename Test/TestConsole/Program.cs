@@ -24,6 +24,7 @@ namespace TestConsole
             { "unreserve" , new UnreserveVehicleCommand()},
             { "searchVehicles" , new SearchVeiclesCommand()},
             { "vehicleInfo" , new VehicleInfoCommand()},
+            { "upsertVehicle" , new UpsertVehicleCommand()},
             { "userInfo" , new UserInfoCommand()},
             { "invoiceInfo" , new InvoiceInfoCommand()}
         };
@@ -47,7 +48,7 @@ namespace TestConsole
                     Console.WriteLine($"\t{command}");
                 }
             }
-            else  if (commands.ContainsKey(commandName))
+            else if (commands.ContainsKey(commandName))
             {
                 var command = commands[commandName];
                 if (args.Any(a => a == "-h"))

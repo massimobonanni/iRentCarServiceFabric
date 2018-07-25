@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace System
 {
     /// <summary>
-    /// Classe che contiene i metodi di estensione che agiscono su istanze di <see cref="string"/>.
+    /// Class StringExtensions.
     /// </summary>
     public static class StringExtensions
     {
@@ -17,9 +17,9 @@ namespace System
         private const ulong FnvOffsetBasis = 14695981039346656037;
 
         /// <summary>
-        /// Calcola l'hash code per una stringa.
+        /// Gets the extended hash.
         /// </summary>
-        /// <param name="value">String di cui calcolare l'hash.</param>
+        /// <param name="value">The value.</param>
         /// <returns>System.Int64.</returns>
         public static long GetExtendedHash(this string value)
         {
@@ -27,10 +27,11 @@ namespace System
         }
 
         /// <summary>
-        /// Calcola l'hash code per un array di <see cref="byte"/>.
+        /// Gets the extended hash.
         /// </summary>
-        /// <param name="value">Array di byte di cui calcolare l'hash.</param>
+        /// <param name="value">The value.</param>
         /// <returns>System.Int64.</returns>
+        /// <exception cref="NullReferenceException">value</exception>
         public static long GetExtendedHash(this byte[] value)
         {
             if (value == null)
@@ -42,7 +43,7 @@ namespace System
                 hash ^= value[i];
                 hash *= FnvPrime;
             }
-
+            
             return (long)hash;
         }
 

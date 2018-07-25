@@ -61,7 +61,7 @@ namespace iRentCar.VehicleActor
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
-            var stateInfo = await GetVehicleInfoFromStateAsync();
+            var stateInfo = await GetVehicleDataFromStateAsync();
             if (stateInfo == null)
             {
                 var info = await this.vehiclesServiceProxy.GetVehicleByPlateAsync(this.Id.GetStringId(),
@@ -74,20 +74,20 @@ namespace iRentCar.VehicleActor
                     vehicleInfo = VehicleData.FromServiceInterfacesInfo(info);
                     vehicleState = info.State.ToActorInterfaceState();
                 }
-                await SetVehicleInfoIntoStateAsync(vehicleInfo);
+                await SetVehicleDataIntoStateAsync(vehicleInfo);
                 await SetVehicleStateIntoStateAsync(vehicleState);
             }
         }
 
         #region [ StateManager accessor ]
-        private async Task<VehicleData> GetVehicleInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<VehicleData> GetVehicleDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var infoData = await this.StateManager.TryGetStateAsync<VehicleData>(InfoKeyName, cancellationToken);
             return infoData.HasValue ? infoData.Value : null;
         }
-        private Task SetVehicleInfoIntoStateAsync(VehicleData info, CancellationToken cancellationToken = default(CancellationToken))
+        private Task SetVehicleDataIntoStateAsync(VehicleData data, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.StateManager.SetStateAsync<VehicleData>(InfoKeyName, info, cancellationToken);
+            return this.StateManager.SetStateAsync<VehicleData>(InfoKeyName, data, cancellationToken);
         }
 
         private async Task<VehicleActorInterface.VehicleState> GetVehicleStateFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -97,7 +97,7 @@ namespace iRentCar.VehicleActor
         }
         private Task SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState state, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.StateManager.SetStateAsync<VehicleActorInterface.VehicleState>(StateKeyName, state, cancellationToken);
+            return this.StateManager.SetStateAsync(StateKeyName, state, cancellationToken);
         }
 
         private async Task<VehicleActorInterface.RentInfo> GetCurrentRentInfoFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -120,7 +120,7 @@ namespace iRentCar.VehicleActor
             if (startReservation >= endReservation)
                 return VehicleActorError.ReservationDatesWrong;
 
-            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+            var info = await GetVehicleDataFromStateAsync(cancellationToken);
             if (info == null)
                 return VehicleActorError.VehicleNotExists;
 
@@ -128,9 +128,8 @@ namespace iRentCar.VehicleActor
 
             if (currentState == VehicleActorInterface.VehicleState.Busy)
                 return VehicleActorError.VehicleBusy;
-            if (currentState == VehicleActorInterface.VehicleState.Busy)
+            if (currentState == VehicleActorInterface.VehicleState.NotAvailable)
                 return VehicleActorError.VehicleNotAvailable;
-
 
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
                 new Uri(UriConstants.UserActorUri));
@@ -186,7 +185,7 @@ namespace iRentCar.VehicleActor
 
         public async Task<VehicleActorInterface.VehicleInfo> GetInfoAsync(CancellationToken cancellationToken)
         {
-            var info = await GetVehicleInfoFromStateAsync(cancellationToken);
+            var info = await GetVehicleDataFromStateAsync(cancellationToken);
             if (info == null)
                 return null;
 
@@ -199,6 +198,20 @@ namespace iRentCar.VehicleActor
             response.CurrentRent = rentInfo;
 
             return response;
+        }
+
+        public async Task<VehicleActorError> UpdateVehicleInfoAsync(VehicleActorInterface.VehicleInfo info,
+            CancellationToken cancellationToken)
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(InfoKeyName));
+
+            var vehicleData = VehicleData.FromActorInterfacesInfo(info);
+            await SetVehicleDataIntoStateAsync(vehicleData, cancellationToken);
+
+            await SetVehicleStateIntoStateAsync(info.State, cancellationToken);
+
+            return VehicleActorError.Ok;
         }
         #endregion [ IVehicleActor interface ]
     }

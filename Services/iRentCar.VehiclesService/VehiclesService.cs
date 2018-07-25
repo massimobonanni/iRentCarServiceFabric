@@ -13,16 +13,20 @@ using VehicleInfo = iRentCar.VehiclesService.Interfaces.VehicleInfo;
 using VehicleState = iRentCar.VehiclesService.Interfaces.VehicleState;
 using Microsoft.ServiceFabric.Data;
 using System.Fabric.Description;
+using iRentCar.VehicleActor.Interfaces;
+using Microsoft.ServiceFabric.Actors;
+using iRentCar.Core;
 
 namespace iRentCar.VehiclesService
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class VehiclesService : StatefulService, IVehiclesService
+    internal sealed class VehiclesService : iRentCar.Core.Implementations.StatefulServiceBase, IVehiclesService
     {
-        public VehiclesService(StatefulServiceContext context, IVehiclesRepository vehiclesRepository)
-            : base(context)
+        public VehiclesService(StatefulServiceContext context, IVehiclesRepository vehiclesRepository,
+            IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+            : base(context, actorFactory, serviceFactory)
         {
             if (vehiclesRepository == null)
                 throw new ArgumentNullException(nameof(vehiclesRepository));
@@ -30,14 +34,16 @@ namespace iRentCar.VehiclesService
             this.vehiclesRepository = vehiclesRepository;
         }
 
-        public VehiclesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager, IVehiclesRepository vehiclesRepository)
-          : base(context, stateManager)
+        public VehiclesService(StatefulServiceContext context, IReliableStateManagerReplica stateManager, IVehiclesRepository vehiclesRepository,
+            IActorFactory actorFactory = null, IServiceFactory serviceFactory = null)
+          : base(context, stateManager, actorFactory, serviceFactory)
         {
             if (vehiclesRepository == null)
                 throw new ArgumentNullException(nameof(vehiclesRepository));
 
             this.vehiclesRepository = vehiclesRepository;
         }
+
 
         private readonly IVehiclesRepository vehiclesRepository;
 
@@ -173,11 +179,45 @@ namespace iRentCar.VehiclesService
                 {
                     var newVehicle = new VehicleInfo(tryVehicle.Value);
                     newVehicle.State = newState;
-                    await this.vehiclesDictionary.SetAsync(tx, plate, newVehicle, TimeSpan.FromSeconds(5),
-                        cancellationToken);
+                    await this.vehiclesDictionary.SetAsync(tx, plate, newVehicle,
+                        TimeSpan.FromSeconds(5), cancellationToken);
                     await tx.CommitAsync();
                     result = true;
                 }
+            }
+
+            return result;
+        }
+
+        public async Task<bool> AddOrUpdateVehicleAsync(VehicleInfo vehicle, CancellationToken cancellationToken)
+        {
+            if (vehicle == null)
+                throw new ArgumentNullException(nameof(vehicle));
+
+            bool result = false;
+            if (!string.IsNullOrWhiteSpace(vehicle.Plate))
+            {
+                using (var tx = this.StateManager.CreateTransaction())
+                {
+                    await this.vehiclesDictionary.SetAsync(tx, vehicle.Plate, vehicle,
+                        TimeSpan.FromSeconds(5), cancellationToken);
+                    await tx.CommitAsync();
+                    result = true;
+                }
+
+                try
+                {
+                    var vehicleProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(vehicle.Plate),
+                        new Uri(UriConstants.VehicleActorUri));
+
+                    await vehicleProxy.UpdateVehicleInfoAsync(vehicle.ToVehicleActorVehicleInfo(), cancellationToken);
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+
             }
 
             return result;

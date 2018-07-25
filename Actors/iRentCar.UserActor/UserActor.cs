@@ -82,16 +82,6 @@ namespace iRentCar.UserActor
                     this.ReportHealthForUserUnknown();
                 }
             }
-
-
-            string reminderName = "Pay cell phone bill";
-            int amountInDollars = 100;
-
-            IActorReminder reminderRegistration = await this.RegisterReminderAsync(
-                reminderName,
-                BitConverter.GetBytes(amountInDollars),
-                TimeSpan.FromDays(3),    //The amount of time to delay before firing the reminder
-                TimeSpan.FromDays(1));    //The time interval between firing of reminders
         }
 
         private const string CurrentRentedCarKeyName = "CurrentRentedCar";

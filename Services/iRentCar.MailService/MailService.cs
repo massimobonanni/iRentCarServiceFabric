@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
+using System.Fabric.Health;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,6 +50,8 @@ namespace iRentCar.MailService
 
         internal const string MailQueueName = "MailQueue";
         private IReliableQueue<MailData> mailQueue;
+
+        internal const string ConfigurationHealthPropertyName = "Configuration";
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -117,17 +120,37 @@ namespace iRentCar.MailService
         /// <param name="updated">if set to <c>true</c> [updated].</param>
         private void ReadSettings(ConfigurationSettings settings, bool updated = false)
         {
-            var mailServiceSection = settings.Sections["MailService"];
-
-            TimeSpan delayBetweenMailSend;
-            if (mailServiceSection.Parameters.Contains("DelayBetweenMailSend") &&
-                TimeSpan.TryParse(mailServiceSection.Parameters["DelayBetweenMailSend"].Value, out delayBetweenMailSend))
+            var configOk = true;
+            if (settings.Sections.Contains("MailService"))
             {
-                this.DelayBetweenMailSend = delayBetweenMailSend;
+                var mailServiceSection = settings.Sections["MailService"];
+
+                TimeSpan delayBetweenMailSend;
+                if (mailServiceSection.Parameters.Contains("DelayBetweenMailSend") &&
+                    TimeSpan.TryParse(mailServiceSection.Parameters["DelayBetweenMailSend"].Value, out delayBetweenMailSend))
+                {
+                    this.DelayBetweenMailSend = delayBetweenMailSend;
+                }
+                else
+                {
+                    configOk = false;
+                }
+            }
+            else
+            {
+                configOk = false;
             }
 
-
-
+            if (configOk)
+            {
+                this.ReportHealthInformation(ConfigurationHealthPropertyName,
+                    $"The configuration is correct!", HealthState.Ok);
+            }
+            else
+            {
+                this.ReportHealthInformation(ConfigurationHealthPropertyName,
+                    $"The configuration is not correct!", HealthState.Error);
+            }
         }
         #endregion
 

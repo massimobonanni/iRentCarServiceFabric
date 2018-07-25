@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace iRentCar.VehiclesService.Interfaces
@@ -15,7 +16,7 @@ namespace iRentCar.VehiclesService.Interfaces
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-
+            
             this.Brand = source.Brand;
             this.DailyCost = source.DailyCost;
             this.Model = source.Model;
@@ -39,8 +40,9 @@ namespace iRentCar.VehiclesService.Interfaces
         {
             get
             {
-                var fullkey = $"{Brand}-{Model}";
-                return fullkey.GetExtendedHash();
+                if (Plate == null)
+                    return 0;
+                return Plate.GetExtendedHash();
             }
         }
 
