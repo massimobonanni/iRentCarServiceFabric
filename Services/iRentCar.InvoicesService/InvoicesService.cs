@@ -56,7 +56,7 @@ namespace iRentCar.InvoicesService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             await InitializeInvoiceNumbersDictionaryAsync();
-
+            
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();

@@ -50,8 +50,6 @@ namespace iRentCar.InvoiceActor
 
         internal const string InvoiceDataKeyName = "InvoiceData";
 
-        public SerializationInfo UriConstants { get; private set; }
-
         #region [ StateManager accessors ]
         private async Task<InvoiceData> GetInvoiceDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
