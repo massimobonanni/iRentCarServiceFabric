@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
     <PackageReference Include="NBuilder" Version="5.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
 </Project>

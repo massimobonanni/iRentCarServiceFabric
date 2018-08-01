@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FizzWare.NBuilder;
 using iRentCar.Core.Interfaces;
@@ -45,7 +47,7 @@ namespace iRentCar.Core.Implementations
         private static void CreateVehiclesList()
         {
             vehicles = new List<VehicleInfo>();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 var brand = brands.ElementAt(RndGenerator.Next(brands.Count));
                 var model = brand.Item2.ElementAt(RndGenerator.Next(brand.Item2.Count));
@@ -101,11 +103,15 @@ namespace iRentCar.Core.Implementations
             return plate;
         }
 
-        public Task<IQueryable<VehicleInfo>> GetAllVehiclesAsync(long lowPartitionKey, long highPartitionKey)
+        public Task<IQueryable<VehicleInfo>> GetAllVehiclesAsync(long lowPartitionKey, long highPartitionKey, CancellationToken token)
         {
             var query = vehicles.Where(a => a.PartitionKey >= lowPartitionKey)
                 .Where(a => a.PartitionKey <= highPartitionKey);
             return Task.FromResult(query.AsQueryable());
+        }
+
+        public void SetServiceHost(ServiceContext hostContext)
+        {
         }
     }
 }

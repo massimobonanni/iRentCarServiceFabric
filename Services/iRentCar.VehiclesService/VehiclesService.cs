@@ -83,6 +83,7 @@ namespace iRentCar.VehiclesService
 
         private async Task LoadVehiclesDictionaryAsync(CancellationToken cancellationToken)
         {
+            this.vehiclesRepository.SetServiceHost(this.Context);
             var dictionary = await this.StateManager.TryGetAsync<IReliableDictionary<string, VehicleInfo>>(VehiclesDictionaryKeyName);
             using (var trx = this.StateManager.CreateTransaction())
             {
@@ -90,7 +91,7 @@ namespace iRentCar.VehiclesService
                 {
                     this.vehiclesDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, VehicleInfo>>(VehiclesDictionaryKeyName);
                     var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
-                    var vehicles = await this.vehiclesRepository.GetAllVehiclesAsync(partition.LowKey, partition.HighKey);
+                    var vehicles = await this.vehiclesRepository.GetAllVehiclesAsync(partition.LowKey, partition.HighKey,cancellationToken);
 
                     foreach (var vehicleInfo in vehicles)
                     {

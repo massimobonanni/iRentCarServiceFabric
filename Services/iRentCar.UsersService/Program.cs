@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using iRentCar.Core.Implementations;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace iRentCar.VehiclesService
+namespace iRentCar.UsersService
 {
     internal static class Program
     {
@@ -20,12 +21,12 @@ namespace iRentCar.VehiclesService
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                var vehiclesRepository = new JsonVehiclesRepository();
+                var usersRepository = new InMemoryUserRepository();
 
-                ServiceRuntime.RegisterServiceAsync("VehiclesServiceType",
-                    context => new VehiclesService(context, vehiclesRepository)).GetAwaiter().GetResult();
+                ServiceRuntime.RegisterServiceAsync("UsersServiceType",
+                    context => new UsersService(context,usersRepository)).GetAwaiter().GetResult();
 
-                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(VehiclesService).Name);
+                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(UsersService).Name);
 
                 // Prevents this host process from terminating so services keep running.
                 Thread.Sleep(Timeout.Infinite);

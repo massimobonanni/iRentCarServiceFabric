@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Chaos.DataStructures;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using iRentCar.UserActor.Interfaces;
 using iRentCar.VehicleActor.Interfaces;
 using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Newtonsoft.Json;
 using TestConsole.Commands;
 
 namespace TestConsole
@@ -36,6 +38,17 @@ namespace TestConsole
 
         static async Task MainAsync(string[] args)
         {
+
+            var repo = new FakeVehiclesRepository();
+            var lista = await repo.GetAllVehiclesAsync(Int64.MinValue, Int64.MaxValue, default(CancellationToken));
+
+            var str = JsonConvert.SerializeObject(lista, Formatting.Indented);
+
+            await File.WriteAllTextAsync(@"D:\Temp\vehicles.json", str);
+
+
+
+
             if (!args.Any())
                 return;
 

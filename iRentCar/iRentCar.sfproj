@@ -39,6 +39,7 @@
     <ProjectReference Include="..\Services\iRentCar.InvoicesService\iRentCar.InvoicesService.csproj" />
     <ProjectReference Include="..\Services\iRentCar.MailService\iRentCar.MailService.csproj" />
     <ProjectReference Include="..\Services\iRentCar.PaymentGateway\iRentCar.PaymentGateway.csproj" />
+    <ProjectReference Include="..\Services\iRentCar.UsersService\iRentCar.UsersService.csproj" />
     <ProjectReference Include="..\Services\iRentCar.VehiclesService\iRentCar.VehiclesService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
