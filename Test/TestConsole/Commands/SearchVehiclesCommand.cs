@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace TestConsole.Commands
 {
-    public class SearchVeiclesCommand : CommandBase
+    public class SearchVehiclesCommand : CommandBase
     {
         private string plateFilter;
         private string modelFilter;

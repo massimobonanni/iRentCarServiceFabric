@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Actors\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
     <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
     <ProjectReference Include="..\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj" />
   </ItemGroup>

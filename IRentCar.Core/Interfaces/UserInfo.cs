@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace iRentCar.Core.Interfaces
 {
@@ -11,12 +12,7 @@ namespace iRentCar.Core.Interfaces
         public string Email { get; set; }
         public bool IsEnabled { get; set; }
 
-        public long PartitionKey
-        {
-            get
-            {
-                return Username.GetExtendedHash();
-            }
-        }
+        [JsonIgnore]
+        public long PartitionKey => Username.GetExtendedHash();
     }
 }

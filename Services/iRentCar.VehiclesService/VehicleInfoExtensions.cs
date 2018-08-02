@@ -37,5 +37,32 @@ namespace iRentCar.VehiclesService.Interfaces
                     return iRentCar.VehicleActor.Interfaces.VehicleState.NotAvailable;
             }
         }
+
+        public static bool VerifyFilters(this VehicleInfo info, string plate, string model, string brand,
+            VehicleState? state)
+        {
+            if (info == null)
+                throw new NullReferenceException(nameof(info));
+
+            var inResult = true;
+            if (!string.IsNullOrWhiteSpace(plate))
+                if (info.Plate != plate)
+                    inResult = false;
+
+            if (!string.IsNullOrWhiteSpace(model) && inResult)
+                if (info.Model != model)
+                    inResult = false;
+
+            if (!string.IsNullOrWhiteSpace(brand) && inResult)
+                if (info.Brand != brand)
+                    inResult = false;
+
+            if (state.HasValue && inResult)
+                if (info.State != state.Value)
+                    inResult = false;
+
+            return inResult;
+        }
+
     }
 }

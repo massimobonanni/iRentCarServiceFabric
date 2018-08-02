@@ -2,7 +2,7 @@
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="iRentCarType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="UsersService_MinReplicaSetSize" DefaultValue="2" />
-    <Parameter Name="UsersService_PartitionCount" DefaultValue="5" />
+    <Parameter Name="UsersService_PartitionCount" DefaultValue="10" />
     <Parameter Name="UsersService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="InvoicesService_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="InvoicesService_PartitionCount" DefaultValue="1" />
@@ -26,7 +26,7 @@
     <Parameter Name="SendGridAdapter_ApiKey" DefaultValue="" />
     <Parameter Name="SendGridAdapter_FromAddress" DefaultValue="info@irentcar.com" />
     <Parameter Name="UserActor_PartitionCount" DefaultValue="10" />
-    <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="UserActor_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
@@ -76,12 +76,12 @@
     <ServiceManifestRef ServiceManifestName="iRentCar.VehiclesServicePkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <DefaultServices>
-    <Service Name="UsersService" ServicePackageActivationMode="ExclusiveProcess">
+    <Service Name="UsersService">
       <StatefulService ServiceTypeName="UsersServiceType" TargetReplicaSetSize="[UsersService_TargetReplicaSetSize]" MinReplicaSetSize="[UsersService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[UsersService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
-    <Service Name="InvoicesService" ServicePackageActivationMode="ExclusiveProcess">
+    <Service Name="InvoicesService">
       <StatefulService ServiceTypeName="InvoicesServiceType" TargetReplicaSetSize="[InvoicesService_TargetReplicaSetSize]" MinReplicaSetSize="[InvoicesService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[InvoicesService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>

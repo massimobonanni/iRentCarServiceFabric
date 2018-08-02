@@ -21,7 +21,7 @@ namespace iRentCar.UsersService
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                var usersRepository = new InMemoryUserRepository();
+                var usersRepository = new JsonUsersRepository();
 
                 ServiceRuntime.RegisterServiceAsync("UsersServiceType",
                     context => new UsersService(context,usersRepository)).GetAwaiter().GetResult();

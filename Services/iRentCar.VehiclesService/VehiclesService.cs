@@ -84,18 +84,27 @@ namespace iRentCar.VehiclesService
         private async Task LoadVehiclesDictionaryAsync(CancellationToken cancellationToken)
         {
             this.vehiclesRepository.SetServiceHost(this.Context);
-            var dictionary = await this.StateManager.TryGetAsync<IReliableDictionary<string, VehicleInfo>>(VehiclesDictionaryKeyName);
+            this.vehiclesDictionary =
+                await this.StateManager.GetOrAddAsync<IReliableDictionary<string, VehicleInfo>>(
+                    VehiclesDictionaryKeyName);
+
+            var fillDictionary = false;
             using (var trx = this.StateManager.CreateTransaction())
             {
-                if (!dictionary.HasValue || await dictionary.Value.GetCountAsync(trx) == 0)
-                {
-                    this.vehiclesDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, VehicleInfo>>(VehiclesDictionaryKeyName);
-                    var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
-                    var vehicles = await this.vehiclesRepository.GetAllVehiclesAsync(partition.LowKey, partition.HighKey,cancellationToken);
+                fillDictionary = await this.vehiclesDictionary.GetCountAsync(trx) == 0;
+            }
 
+            if (fillDictionary)
+            {
+                var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
+                var vehicles =
+                    await this.vehiclesRepository.GetAllVehiclesAsync(partition.LowKey, partition.HighKey,
+                        cancellationToken);
+                using (var trx = this.StateManager.CreateTransaction())
+                {
                     foreach (var vehicleInfo in vehicles)
                     {
-                        await this.vehiclesDictionary.AddAsync(trx, vehicleInfo.Plate, new VehicleInfo()
+                        await this.vehiclesDictionary.SetAsync(trx, vehicleInfo.Plate, new VehicleInfo()
                         {
                             Brand = vehicleInfo.Brand,
                             DailyCost = vehicleInfo.DailyCost,
@@ -104,11 +113,8 @@ namespace iRentCar.VehiclesService
                             State = VehicleState.Free
                         }, TimeSpan.FromSeconds(4), cancellationToken);
                     }
+                    await trx.CommitAsync();
                 }
-                else
-                    this.vehiclesDictionary = dictionary.Value;
-
-                await trx.CommitAsync();
             }
         }
 
@@ -126,24 +132,7 @@ namespace iRentCar.VehiclesService
                 {
                     var vehicle = vehiclesEnumerator.Current.Value;
 
-                    var vehicleInResult = true;
-                    if (!string.IsNullOrWhiteSpace(plate))
-                        if (vehicle.Plate != plate)
-                            vehicleInResult = false;
-
-                    if (!string.IsNullOrWhiteSpace(model) && vehicleInResult)
-                        if (vehicle.Model != model)
-                            vehicleInResult = false;
-
-                    if (!string.IsNullOrWhiteSpace(brand) && vehicleInResult)
-                        if (vehicle.Brand != brand)
-                            vehicleInResult = false;
-
-                    if (state.HasValue && vehicleInResult)
-                        if (vehicle.State != state.Value)
-                            vehicleInResult = false;
-
-                    if (vehicleInResult)
+                    if (vehicle.VerifyFilters(plate, model, brand, state))
                         resultList.Add(vehicle);
                 }
                 await tx.CommitAsync();
@@ -213,11 +202,7 @@ namespace iRentCar.VehiclesService
 
                     await vehicleProxy.UpdateVehicleInfoAsync(vehicle.ToVehicleActorVehicleInfo(), cancellationToken);
                 }
-                catch (Exception ex)
-                {
-
-                    throw;
-                }
+                catch {}
 
             }
 

@@ -9,7 +9,7 @@
     <Parameter Name="VehiclesService_PartitionCount" Value="1" />
     <Parameter Name="VehiclesService_MinReplicaSetSize" Value="1" />
     <Parameter Name="VehiclesService_TargetReplicaSetSize" Value="1" />
-    <Parameter Name="FrontEnd_InstanceCount" Value="-1" />
+    <Parameter Name="FrontEnd_InstanceCount" Value="1" />
     <Parameter Name="MailService_DelayBetweenMailSend" Value="00:00:10" />
     <Parameter Name="SendGridAdapter_SendMailUri" Value="https://api.sendgrid.com/v3/mail/send" />
     <Parameter Name="MailService_MinReplicaSetSize" Value="1" />

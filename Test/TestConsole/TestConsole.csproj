@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.InvoicesService.Interfaces\iRentCar.InvoicesService.Interfaces.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Services\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.VehiclesSerive.Interfaces\iRentCar.VehiclesService.Interfaces.csproj" />
   </ItemGroup>
 

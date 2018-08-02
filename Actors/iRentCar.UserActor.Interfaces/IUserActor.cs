@@ -16,5 +16,6 @@ namespace iRentCar.UserActor.Interfaces
         Task<bool> IsValidAsync(CancellationToken cancellationToken);
         Task<InvoiceInfo> GetActiveInvoiceAsync(CancellationToken cancellationToken);
         Task<UserInfo> GetInfoAsync(CancellationToken cancellationToken);
+        Task<UserActorError> UpdateUserInfoAsync(UserInfo info, CancellationToken cancellationToken);
     }
 }

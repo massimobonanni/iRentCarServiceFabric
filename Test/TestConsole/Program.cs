@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FizzWare.NBuilder;
 using iRentCar.Core;
 using iRentCar.Core.Implementations;
 using iRentCar.MailService.Interfaces;
@@ -24,11 +25,12 @@ namespace TestConsole
         {
             { "reserve" , new ReserveVehicleCommand()},
             { "unreserve" , new UnreserveVehicleCommand()},
-            { "searchVehicles" , new SearchVeiclesCommand()},
+            { "searchVehicles" , new SearchVehiclesCommand()},
             { "vehicleInfo" , new VehicleInfoCommand()},
             { "upsertVehicle" , new UpsertVehicleCommand()},
             { "userInfo" , new UserInfoCommand()},
-            { "invoiceInfo" , new InvoiceInfoCommand()}
+            { "invoiceInfo" , new InvoiceInfoCommand()},
+            { "searchUsers" , new SearchUsersCommand()}
         };
 
         static void Main(string[] args)
@@ -38,17 +40,27 @@ namespace TestConsole
 
         static async Task MainAsync(string[] args)
         {
+            //var repo = new FakeVehiclesRepository();
+            //var vehicles = await repo.GetAllVehiclesAsync(Int64.MinValue, Int64.MaxValue, default(CancellationToken));
+            //var str = JsonConvert.SerializeObject(vehicles);
 
-            var repo = new FakeVehiclesRepository();
-            var lista = await repo.GetAllVehiclesAsync(Int64.MinValue, Int64.MaxValue, default(CancellationToken));
+            //await File.WriteAllTextAsync(@"e:\Temp\vehicles.json", str);
 
-            var str = JsonConvert.SerializeObject(lista, Formatting.Indented);
+            ////var repo = new InMemoryUserRepository();
+            ////var lista = await repo.GetAllUsersAsync(Int64.MinValue, Int64.MaxValue, default(CancellationToken));
 
-            await File.WriteAllTextAsync(@"D:\Temp\vehicles.json", str);
+            //var lista=FizzWare.NBuilder.Builder<iRentCar.Core.Interfaces.UserInfo>.CreateListOfSize(100000)
+            //    .All()
+            //    .With(u => u.FirstName = Faker.Name.First())
+            //    .With(u => u.LastName = Faker.Name.Last())
+            //    .With(u => u.Username = Faker.Internet.UserName())
+            //    .With(u => u.Email = Faker.Internet.Email())
+            //    .Build();
 
+            // str = JsonConvert.SerializeObject(lista);
 
-
-
+            //await File.WriteAllTextAsync(@"e:\Temp\users.json", str);
+            
             if (!args.Any())
                 return;
 

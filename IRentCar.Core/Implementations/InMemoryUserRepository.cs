@@ -32,13 +32,6 @@ namespace iRentCar.Core.Implementations
             return Task.FromResult(query.ToList().AsQueryable()) ;
         }
 
-        public Task<CoreInterfaces.UserInfo> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
-        {
-            CoreInterfaces.UserInfo user = users.FirstOrDefault(a=>a.Username==username);
-
-            return Task.FromResult(user);
-        }
-
         public void SetServiceHost(ServiceContext hostContext)
         {
 

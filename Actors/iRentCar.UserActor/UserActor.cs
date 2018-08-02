@@ -15,6 +15,7 @@ using System.Fabric.Health;
 using System.Fabric;
 using iRentCar.InvoiceActor.Interfaces;
 using iRentCar.MailService.Interfaces;
+using iRentCar.UsersService.Interfaces;
 
 namespace iRentCar.UserActor
 {
@@ -31,18 +32,19 @@ namespace iRentCar.UserActor
     internal class UserActor : Core.Implementations.ActorBase, IUserActor, IRemindable, IInvoiceCallbackActor
     {
         public UserActor(ActorService actorService, ActorId actorId)
-            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), new InMemoryUserRepository(), null)
+            : this(actorService, actorId, new ReliableFactory(), new ReliableFactory(), null, null)
         {
 
         }
 
         public UserActor(ActorService actorService, ActorId actorId, IActorFactory actorFactory,
-            IServiceFactory serviceFactory, IUsersRepository userRepository, IInvoicesServiceProxy invoicesServiceProxy)
+            IServiceFactory serviceFactory, IUsersServiceProxy usersServiceProxy, IInvoicesServiceProxy invoicesServiceProxy)
             : base(actorService, actorId, actorFactory, serviceFactory)
         {
-            if (userRepository == null)
-                throw new ArgumentNullException(nameof(userRepository));
-            this.userRepository = userRepository;
+            //if (usersServiceProxy == null)
+            //     this.usersServiceProxy = UsersServiceProxy.Instance;
+            // else
+            this.usersServiceProxy = usersServiceProxy;
 
             if (invoicesServiceProxy == null)
                 this.invoicesServiceProxy = InvoicesServiceProxy.Instance;
@@ -50,7 +52,7 @@ namespace iRentCar.UserActor
                 this.invoicesServiceProxy = invoicesServiceProxy;
         }
 
-        private readonly IUsersRepository userRepository;
+        private readonly IUsersServiceProxy usersServiceProxy;
         private readonly IInvoicesServiceProxy invoicesServiceProxy;
 
         /// <summary>
@@ -65,7 +67,7 @@ namespace iRentCar.UserActor
 
             if (userData == null)
             {
-                var user = await this.userRepository.GetUserByUsernameAsync(this.Id.ToString(), default(CancellationToken));
+                var user = await this.usersServiceProxy.GetUserByUserNameAsync(this.Id.ToString(), default(CancellationToken));
                 if (user != null)
                 {
                     userData = new UserData()
@@ -155,7 +157,7 @@ namespace iRentCar.UserActor
         private async Task SendReminderMail()
         {
             var userInfo = await this.GetUserDataFromStateAsync(default(CancellationToken));
-            if (userInfo != null)
+            if (userInfo != null && !string.IsNullOrWhiteSpace(userInfo.Email))
             {
                 var mail = new MailInfo()
                 {
@@ -285,6 +287,17 @@ namespace iRentCar.UserActor
             }
 
             return userInfo;
+        }
+
+        public async Task<UserActorError> UpdateUserInfoAsync(UserActorInterfaces.UserInfo info, CancellationToken cancellationToken)
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            var userData = new UserData(info);
+            await SetUserDataIntoStateAsync(userData, cancellationToken);
+
+            return UserActorError.Ok;
         }
 
         #endregion [ IUserActor interface ]

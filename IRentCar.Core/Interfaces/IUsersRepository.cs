@@ -9,7 +9,5 @@ namespace iRentCar.Core.Interfaces
     {
         void SetServiceHost(ServiceContext hostContext);
         Task<IQueryable<UserInfo>> GetAllUsersAsync(long lowPartitionKey, long highPartitionKey,CancellationToken token);
-
-        Task<UserInfo> GetUserByUsernameAsync(string username, CancellationToken cancellationToken);
     }
 }

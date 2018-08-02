@@ -16,13 +16,15 @@ namespace iRentCar.Core.Implementations
     {
         private ServiceContext hostContext;
 
-        private IEnumerable<VehicleInfo> vehicles;
+        private static IEnumerable<VehicleInfo> vehicles;
+        private object vehiclesSyncObject=new object();
+
 
         public async Task<IQueryable<VehicleInfo>> GetAllVehiclesAsync(long lowPartitionKey, long highPartitionKey, CancellationToken token)
         {
             if (vehicles == null)
             {
-                await LoadVeihiclesFromFileAsync(token);
+                await LoadVehiclesFromFileAsync(token);
             }
 
             var query = vehicles.Where(a => a.PartitionKey >= lowPartitionKey)
@@ -31,7 +33,7 @@ namespace iRentCar.Core.Implementations
             return query.AsQueryable();
         }
 
-        private async Task LoadVeihiclesFromFileAsync( CancellationToken token)
+        private async Task LoadVehiclesFromFileAsync( CancellationToken token)
         {
             var dataPkg = hostContext.CodePackageActivationContext.GetDataPackageObject("Data");
 
@@ -45,7 +47,10 @@ namespace iRentCar.Core.Implementations
 
             if (!string.IsNullOrWhiteSpace(fileContent))
             {
-                vehicles = JsonConvert.DeserializeObject<List<VehicleInfo>>(fileContent);
+                lock (vehiclesSyncObject)
+                {
+                    vehicles = JsonConvert.DeserializeObject<List<VehicleInfo>>(fileContent);
+                }
             }
 
         }

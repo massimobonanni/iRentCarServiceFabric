@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace iRentCar.Core.Interfaces
 {
@@ -10,13 +11,7 @@ namespace iRentCar.Core.Interfaces
         public Decimal DailyCost { get; set; }
         public VehicleState State { get; set; }
 
-        public long PartitionKey
-        {
-            get
-            {
-                return Plate.GetExtendedHash();
-            }
-        }
-
+        [JsonIgnore]
+        public long PartitionKey => Plate.GetExtendedHash();
     }
 }

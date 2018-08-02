@@ -67,77 +67,62 @@ namespace iRentCar.VehiclesService.Interfaces
             await EnsurePartitionCount();
             IEnumerable<VehicleInfo> result = null;
             var taskList = new List<Task<List<VehicleInfo>>>();
-            try
+
+            foreach (var partition in partitionInfoList)
             {
-                foreach (var partition in partitionInfoList)
-                {
-                    var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
-                    var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                    taskList.Add(proxy.SearchVehiclesAsync(plate, model, brand, state, cancellationToken));
-                }
-                var resultLists=await Task.WhenAll(taskList);
-                result = resultLists.SelectMany(t => t).ToList();
+                var srvPartitionKey = new ServicePartitionKey(partition.LowKey);
+                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+                taskList.Add(proxy.SearchVehiclesAsync(plate, model, brand, state, cancellationToken));
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var resultLists = await Task.WhenAll(taskList);
+            result = resultLists.SelectMany(t => t).ToList();
 
             return result;
         }
 
         public async Task<VehicleInfo> GetVehicleByPlateAsync(string plate, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(plate))
+                throw new ArgumentException(nameof(plate));
+
             await EnsurePartitionCount();
             VehicleInfo result = null;
-            try
-            {
-                var vehicle = new VehicleInfo() { Plate = plate };
-                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
-                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                result = await proxy.GetVehicleByPlateAsync(plate, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+
+            var vehicle = new VehicleInfo() { Plate = plate };
+            var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+            var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+            result = await proxy.GetVehicleByPlateAsync(plate, cancellationToken);
 
             return result;
         }
 
         public async Task<bool> UpdateVehicleStateAsync(string plate, VehicleState newState, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(plate))
+                throw new ArgumentException(nameof(plate));
+
             await EnsurePartitionCount();
             bool result = false;
-            try
-            {
-                var vehicle = new VehicleInfo() { Plate = plate };
-                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
-                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                result = await proxy.UpdateVehicleStateAsync(plate, newState, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+
+            var vehicle = new VehicleInfo() { Plate = plate };
+            var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+            var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+            result = await proxy.UpdateVehicleStateAsync(plate, newState, cancellationToken);
 
             return result;
         }
 
         public async Task<bool> AddOrUpdateVehicleAsync(VehicleInfo vehicle, CancellationToken cancellationToken)
         {
+            if (vehicle==null)
+                throw new ArgumentNullException(nameof(vehicle));
+
             await EnsurePartitionCount();
             bool result = false;
-            try
-            {
-                var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
-                var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
-                result = await proxy.AddOrUpdateVehicleAsync(vehicle, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+
+            var srvPartitionKey = new ServicePartitionKey(vehicle.PartitionKey);
+            var proxy = ServiceProxy.Create<IVehiclesService>(serviceUri, srvPartitionKey);
+            result = await proxy.AddOrUpdateVehicleAsync(vehicle, cancellationToken);
 
             return result;
         }
