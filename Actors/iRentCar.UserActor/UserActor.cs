@@ -16,6 +16,7 @@ using System.Fabric;
 using iRentCar.InvoiceActor.Interfaces;
 using iRentCar.MailService.Interfaces;
 using iRentCar.UsersService.Interfaces;
+//using iRentCar.UsersService.Interfaces;
 
 namespace iRentCar.UserActor
 {
@@ -41,10 +42,10 @@ namespace iRentCar.UserActor
             IServiceFactory serviceFactory, IUsersServiceProxy usersServiceProxy, IInvoicesServiceProxy invoicesServiceProxy)
             : base(actorService, actorId, actorFactory, serviceFactory)
         {
-            //if (usersServiceProxy == null)
-            //     this.usersServiceProxy = UsersServiceProxy.Instance;
-            // else
-            this.usersServiceProxy = usersServiceProxy;
+            if (usersServiceProxy == null)
+                this.usersServiceProxy = UsersServiceProxy.Instance;
+            else
+                this.usersServiceProxy = usersServiceProxy;
 
             if (invoicesServiceProxy == null)
                 this.invoicesServiceProxy = InvoicesServiceProxy.Instance;
@@ -139,6 +140,7 @@ namespace iRentCar.UserActor
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
+
             var invoiceKey = GenerateInvoiceKey(data.Number);
             await this.StateManager.SetStateAsync<InvoiceData>(invoiceKey, data, cancellationToken);
         }
@@ -148,15 +150,15 @@ namespace iRentCar.UserActor
         #region [ Internal methods ]
         private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var userData = await GetUserDataFromStateAsync(default(CancellationToken));
+            var userData = await GetUserDataFromStateAsync(cancellationToken);
             if (userData == null)
                 ReportHealthForUserUnknown();
             return userData != null;
         }
 
-        private async Task SendReminderMail()
+        private async Task SendReminderMail(CancellationToken cancellationToken=default(CancellationToken))
         {
-            var userInfo = await this.GetUserDataFromStateAsync(default(CancellationToken));
+            var userInfo = await this.GetUserDataFromStateAsync(cancellationToken);
             if (userInfo != null && !string.IsNullOrWhiteSpace(userInfo.Email))
             {
                 var mail = new MailInfo()
@@ -168,7 +170,7 @@ namespace iRentCar.UserActor
 
                 try
                 {
-                    await MailServiceProxy.Instance.SendMailAsync(mail, null, default(CancellationToken));
+                    await MailServiceProxy.Instance.SendMailAsync(mail, null, cancellationToken);
                 }
                 catch { }
             }
@@ -310,9 +312,8 @@ namespace iRentCar.UserActor
                 var currentInvoice = await this.GetInvoiceDataFromStateAsync(cancellationToken);
                 if (currentInvoice.Number == invoiceNumber)
                 {
-                    var invoiceKey = this.GenerateInvoiceKey(currentInvoice.Number);
-                    await this.StateManager.SetStateAsync<InvoiceData>(invoiceKey, currentInvoice, cancellationToken);
-                    await this.SetInvoiceDataIntoStateAsync(null);
+                    await this.AddOrUpdateInvoiceIntoStateAsync(currentInvoice, cancellationToken);
+                    await this.SetInvoiceDataIntoStateAsync(null,cancellationToken);
                 }
             }
         }

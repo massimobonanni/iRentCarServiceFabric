@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FizzWare.NBuilder;
 using iRentCar.Core.Interfaces;
 using Newtonsoft.Json;
 
@@ -17,7 +16,7 @@ namespace iRentCar.Core.Implementations
         private ServiceContext hostContext;
 
         private static IEnumerable<UserInfo> users;
-        private object usersSyncObject=new object();
+        private readonly object usersSyncObject=new object();
 
 
        private async Task LoadUsersFromFileAsync( CancellationToken token)

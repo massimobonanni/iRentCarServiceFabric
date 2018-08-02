@@ -20,7 +20,7 @@ namespace iRentCar.Core.Implementations
             return ActorProxy.Create<TActorInterface>(actorId, serviceUri, listenerName);
         }
 
-        TActorInterface IActorFactory.Create<TActorInterface>(ActorId actorId, string applicationName = null, string serviceName = null, string listenerName = null)
+        TActorInterface IActorFactory.Create<TActorInterface>(ActorId actorId, string applicationName, string serviceName, string listenerName)
         {
             return ActorProxy.Create<TActorInterface>(actorId, applicationName, serviceName, listenerName);
         }

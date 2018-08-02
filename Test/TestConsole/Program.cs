@@ -1,20 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Fabric;
-using System.Fabric.Chaos.DataStructures;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using FizzWare.NBuilder;
-using iRentCar.Core;
-using iRentCar.Core.Implementations;
-using iRentCar.MailService.Interfaces;
-using iRentCar.UserActor.Interfaces;
-using iRentCar.VehicleActor.Interfaces;
-using Microsoft.ServiceFabric.Actors.Client;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
-using Newtonsoft.Json;
 using TestConsole.Commands;
 
 namespace TestConsole

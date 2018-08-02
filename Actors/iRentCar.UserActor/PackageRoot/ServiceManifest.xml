@@ -26,8 +26,8 @@
   <ConfigPackage Name="Config" Version="1.0.0" />
   <Resources>
     <Endpoints>
-      <Endpoint Name="UserActorEndpointV2" />
       <Endpoint Name="UserActorServiceEndpointV2" />
+      <Endpoint Name="UserActorEndpointV2" />
       <Endpoint Name="UserActorReplicatorEndpoint" />
     </Endpoints>
   </Resources>
