@@ -17,7 +17,8 @@ namespace TestConsole
             { "upsertVehicle" , new UpsertVehicleCommand()},
             { "userInfo" , new UserInfoCommand()},
             { "invoiceInfo" , new InvoiceInfoCommand()},
-            { "searchUsers" , new SearchUsersCommand()}
+            { "searchUsers" , new SearchUsersCommand()},
+            { "upsertUser" , new UpsertUserCommand()}
         };
 
         static void Main(string[] args)
