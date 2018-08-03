@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NETCore.App" Version="2.0.7" />
+  </ItemGroup>
+
 </Project>

@@ -11,7 +11,7 @@
     <FabActUtilWorkingDir>$(BaseIntermediateOutputPath)\FabActUtilTemp</FabActUtilWorkingDir>
     <RootNamespace>iRentCar.UserActor</RootNamespace>
     <AssemblyName>iRentCar.UserActor</AssemblyName>
-    <TargetLatestRuntimePatch>false</TargetLatestRuntimePatch>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +27,10 @@
     <ProjectReference Include="..\..\Services\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj" />
     <ProjectReference Include="..\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
     <ProjectReference Include="..\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NETCore.App" Version="2.0.7" />
   </ItemGroup>
 
 </Project>

@@ -52,9 +52,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.InvoicesService.Test", "Test\iRentCar.InvoicesService.Test\iRentCar.InvoicesService.Test.csproj", "{4EBC6A22-5971-45B0-A36D-96788C294835}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRentCar.UsersService", "Services\iRentCar.UsersService\iRentCar.UsersService.csproj", "{3E9C2B39-E32C-4CD5-B697-ED44847D3061}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.UsersService", "Services\iRentCar.UsersService\iRentCar.UsersService.csproj", "{3E9C2B39-E32C-4CD5-B697-ED44847D3061}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRentCar.UsersService.Interfaces", "Services\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj", "{0E701F6A-81F4-4F77-BE6C-7F43EF3AEB56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRentCar.UsersService.Interfaces", "Services\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj", "{0E701F6A-81F4-4F77-BE6C-7F43EF3AEB56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

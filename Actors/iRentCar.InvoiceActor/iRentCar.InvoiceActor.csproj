@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -22,6 +22,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
     <ProjectReference Include="..\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NETCore.App" Version="2.0.7" />
   </ItemGroup>
 
 </Project>

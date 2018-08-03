@@ -22,4 +22,8 @@
     <ProjectReference Include="..\iRentCar.VehicleActor.Interfaces\iRentCar.VehicleActor.Interfaces.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NETCore.App" Version="2.0.7" />
+  </ItemGroup>
+
 </Project>
