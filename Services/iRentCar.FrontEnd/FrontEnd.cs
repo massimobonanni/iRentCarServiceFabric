@@ -35,12 +35,19 @@ namespace iRentCar.FrontEnd
                     {
                         ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
+                        var environment = FabricRuntime.GetActivationContext()?
+                            .GetConfigurationPackageObject("Config")?
+                            .Settings.Sections["Environment"]?
+                            .Parameters["ASPNETCORE_ENVIRONMENT"]?.Value;
+
+
                         return new WebHostBuilder()
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
+                                    .UseEnvironment(environment)
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
                                     .UseUrls(url)

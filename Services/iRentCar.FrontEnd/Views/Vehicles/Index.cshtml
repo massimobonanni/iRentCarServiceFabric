@@ -1,29 +1,29 @@
 ﻿@model VehicleSearchResult
 
 @{
-    ViewData["Title"] = "Ricerca autoveicoli";
+    ViewData["Title"] = "Search Vehicles";
 }
 
-<h2>Ricerca autoveicoli</h2>
+<h2>Search Vehicles</h2>
 
 <form asp-action="Index" method="get" class="panel panel-primary">
     <div class="panel-body">
         <div class="row">
             <div class="form-group col-md-6">
-                <label for="brand">Costruttore</label>
-                <input class="form-control" placeholder="Inserisci il costruttore" type="text" name="brand"
+                <label for="brand">Brand</label>
+                <input class="form-control" placeholder="Insert the vehicle brand" type="text" name="brand"
                        id="brand" value="@Model.BrandFilter" />
             </div>
             <div class="form-group col-md-6">
-                <label for="model">Modello</label>
-                <input class="form-control" placeholder="Inserisci il modello" type="text" name="model"
+                <label for="model">Model</label>
+                <input class="form-control" placeholder="Insert the vehicle model" type="text" name="model"
                        id="model" value="@Model.ModelFilter" />
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-6">
-                <label for="plate">Targa</label>
-                <input class="form-control" placeholder="Inserisci la targa" type="text" name="plate"
+                <label for="plate">Plate</label>
+                <input class="form-control" placeholder="Insert the vehicle plate" type="text" name="plate"
                        id="plate" value="@Model.PlateFilter" />
             </div>
             @{
@@ -33,16 +33,16 @@
                 var notAvailableSelected = Model.StateFilter.HasValue && Model.StateFilter.Value == iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable ? "selected" : "";
             }
             <div class="form-group col-md-6">
-                <label for="state">Stato</label>
+                <label for="state">State</label>
                 <select class="form-control" name="state" id="state">
-                    <option value="">Qualsiasi</option>
-                    <option value="Free">Disponibile</option>
-                    <option value="Busy">Prenotata</option>
-                    <option value="NotAvailable">Non utilizzabile</option>
+                    <option value="">All</option>
+                    <option value="Free">Available</option>
+                    <option value="Busy">Rented</option>
+                    <option value="NotAvailable">Unavailable</option>
                 </select>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Cerca</button>
+        <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
 <br />
@@ -52,19 +52,19 @@
             <thead>
                 <tr>
                     <th>
-                        Targa
+                        Plate
                     </th>
                     <th>
-                        Modello
+                        Model
                     </th>
                     <th>
-                        Costruttore
+                        Brand
                     </th>
                     <th>
-                        Costo
+                        Cost
                     </th>
                     <th>
-                        Stato
+                        State
                     </th>
                     <th>
                         Modified
@@ -92,19 +92,19 @@
                             @switch (item.State)
                             {
                                 case iRentCar.VehiclesService.Interfaces.VehicleState.Busy:
-                                    @: Prenotata
+                                    @: Rented
                                     break;
                                 case iRentCar.VehiclesService.Interfaces.VehicleState.Free:
-                                    @: Disponibile
+                                    @: Available
                                     break;
                                 case iRentCar.VehiclesService.Interfaces.VehicleState.NotAvailable:
-                                    @: Non Utilizzabile
+                                    @: Unavailable
                                     break;
                             }
                         </td>
                         <td>
-                            @Html.ActionLink("Prenota", "Reserve", new { plate = item.Plate }) |
-                            @Html.ActionLink("Riconsegna", "Unreserve", new { plate = item.Plate })
+                            @Html.ActionLink("Reserve", "Reserve", new { plate = item.Plate }) |
+                            @Html.ActionLink("Unreserve", "Unreserve", new { plate = item.Plate })
                         </td>
                     </tr>
                 }

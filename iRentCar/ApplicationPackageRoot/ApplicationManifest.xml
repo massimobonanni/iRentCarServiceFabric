@@ -28,6 +28,7 @@
     <Parameter Name="UserActor_PartitionCount" DefaultValue="10" />
     <Parameter Name="UserActor_MinReplicaSetSize" DefaultValue="2" />
     <Parameter Name="UserActor_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ASPNETCORE_ENVIRONMENT" DefaultValue="Production" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -65,6 +66,15 @@
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="iRentCar.FrontEndPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="Environment">
+            <Parameter Name="ASPNETCORE_ENVIRONMENT" Value="[ASPNETCORE_ENVIRONMENT]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="iRentCar.PaymentGatewayPkg" ServiceManifestVersion="1.0.0" />
