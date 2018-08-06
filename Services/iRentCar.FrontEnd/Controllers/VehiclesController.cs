@@ -32,6 +32,8 @@ namespace iRentCar.FrontEnd.Controllers
         private readonly VehiclesServiceInterfaces.IVehiclesServiceProxy vehiclesServiceProxy;
         private readonly CoreInterfaces.IActorFactory actorFactory;
 
+        [Route("Vehicles")]
+        [Route("Vehicles/Index")]
         public async Task<ActionResult> Index(string brand, string model, string plate, VehiclesServiceInterfaces.VehicleState? state, int pageIndex = 0, int pageSize = 10)
         {
             var vehicles =
@@ -55,8 +57,7 @@ namespace iRentCar.FrontEnd.Controllers
             return View(result);
         }
 
-
-        [HttpGet("{plate}")]
+        [HttpGet("Vehicles/{plate}")]
         public async Task<ActionResult> Details(string plate)
         {
             var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
@@ -69,6 +70,8 @@ namespace iRentCar.FrontEnd.Controllers
 
             return View(vehicleInfo);
         }
+
+        [HttpGet("Vehicles/reserve/{plate}")]
 
         public async Task<ActionResult> Reserve(string plate)
         {
@@ -86,9 +89,9 @@ namespace iRentCar.FrontEnd.Controllers
         }
 
         // POST: Vehicles/Create
-        [HttpPut]
+        [HttpPost("Vehicles/reserve/{plate}")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Reserve(string plate, [FromBody] VehicleInfoForReserveDto reservation)
+        public async Task<ActionResult> Reserve(string plate, [FromForm] VehicleInfoForReserveDto reservation)
         {
             if (!ModelState.IsValid)
                 return View();

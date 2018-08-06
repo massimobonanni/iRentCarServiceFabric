@@ -1,60 +1,59 @@
 ﻿@model iRentCar.FrontEnd.Models.Dto.VehicleInfoForReserveDto
 
 @{
-    ViewData["Title"] = "Reserve";
+    ViewData["Title"] = "Reserve a vehicle";
 }
 
 <h2>Reserve</h2>
 
-<h4>VehicleInfoForReserveDto</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <dl class="dl-horizontal">
             <dt>
-                Targa
+                Plate
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Plate)
             </dd>
             <dt>
-                Costruttore
+                Brand
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Brand)
             </dd>
             <dt>
-                Modello
+                Model
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Model)
             </dd>
             <dt>
-                Costo Giornaliero (€)
+                Daily Cost (€)
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.DailyCost)
             </dd>
         </dl>
-        <form asp-action="Reserve" >
+        <form asp-action="Reserve" method="post" >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Customer" class="control-label"></label>
+                <label asp-for="Customer" class="control-label">Customer name</label>
                 <input asp-for="Customer" class="form-control" />
                 <span asp-validation-for="Customer" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="StartReservation" class="control-label"></label>
+                <label asp-for="StartReservation" class="control-label">Start reservatin date</label>
                 <input asp-for="StartReservation" class="form-control" />
                 <span asp-validation-for="StartReservation" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EndReservation" class="control-label"></label>
+                <label asp-for="EndReservation" class="control-label">End reservation date</label>
                 <input asp-for="EndReservation" class="form-control" />
                 <span asp-validation-for="EndReservation" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Prenota" class="btn btn-default" />
+                <input type="submit" value="Reserve" class="btn btn-default" />
             </div>
         </form>
     </div>

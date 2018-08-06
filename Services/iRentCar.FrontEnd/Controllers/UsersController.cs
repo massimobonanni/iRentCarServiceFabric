@@ -22,7 +22,8 @@ namespace iRentCar.FrontEnd.Controllers
 
         private readonly IUsersServiceProxy usersServiceProxy;
 
-        // GET: Users
+        [Route("Users")]
+        [Route("Users/Index")]
         public async Task<ActionResult> Index(string username, string firstName, string lastName, string mail, int pageIndex = 0, int pageSize = 10)
         {
             var users =
