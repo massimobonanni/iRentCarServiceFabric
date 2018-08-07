@@ -14,7 +14,7 @@ namespace iRentCar.InvoiceActor.Interfaces
         [EnumMember]
         InvoiceNotValid = 3,
         [EnumMember]
-        InvoiceAlreadyPaid = 2,
+        InvoiceAlreadyPaid = 4,
         [EnumMember]
         GenericError = 999
     }

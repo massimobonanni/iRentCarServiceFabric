@@ -3,24 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using iRentCar.Core;
+using iRentCar.Core.Interfaces;
 using iRentCar.FrontEnd.Models;
+using iRentCar.FrontEnd.Models.Dto;
+using iRentCar.UserActor.Interfaces;
 using iRentCar.UsersService.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.ServiceFabric.Actors;
 
 namespace iRentCar.FrontEnd.Controllers
 {
     public class UsersController : Controller
     {
-        public UsersController(IUsersServiceProxy usersServiceProxy)
+        public UsersController(IUsersServiceProxy usersServiceProxy, IActorFactory actorFactory)
         {
             if (usersServiceProxy == null)
                 throw new ArgumentNullException(nameof(usersServiceProxy));
+            if (actorFactory == null)
+                throw new ArgumentNullException(nameof(actorFactory));
 
             this.usersServiceProxy = usersServiceProxy;
+            this.actorFactory = actorFactory;
         }
 
         private readonly IUsersServiceProxy usersServiceProxy;
+        private readonly IActorFactory actorFactory;
+
 
         [Route("Users")]
         [Route("Users/Index")]
@@ -47,33 +57,88 @@ namespace iRentCar.FrontEnd.Controllers
             return View(result);
         }
 
+        [Route("Users/Details/{username}")]
         // GET: Users/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(string username)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest();
+
+            var user = await this.usersServiceProxy.GetUserByUserNameAsync(username, default(CancellationToken));
+
+            if (user == null)
+                return NotFound();
+
+            var userProxy =
+                this.actorFactory.Create<IUserActor>(new ActorId(username), new Uri(UriConstants.UserActorUri));
+
+            UserActor.Interfaces.UserInfo userInfo = null;
+
+            try
+            {
+                userInfo = await userProxy.GetInfoAsync(default(CancellationToken));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+
+            if (userInfo == null)
+                return NotFound();
+
+            UserInfoForDetails userInfoForDetails = new UserInfoForDetails(username, userInfo);
+            return View(userInfoForDetails);
         }
 
-        // GET: Users/Create
+        [Route("Users/Create")]
         public ActionResult Create()
         {
-            return View();
+            var userInfo = new UserInfoForCreate();
+            return View(userInfo);
         }
 
         // POST: Users/Create
-        [HttpPost]
+        [HttpPost("Users/Create")]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create([FromForm] UserInfoForCreate userInfo)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                var user = await this.usersServiceProxy.GetUserByUserNameAsync(userInfo.Username, default(CancellationToken));
+                if (user != null)
+                {
+                    ModelState.AddModelError("username", "A user with the same username already exists");
+                    return View(userInfo);
+                }
 
+                user = new UsersService.Interfaces.UserInfo()
+                {
+                    Username = userInfo.Username,
+                    Email = userInfo.Email,
+                    FirstName = userInfo.FirstName,
+                    LastName = userInfo.LastName,
+                    IsEnabled = userInfo.IsEnabled
+                };
+
+                bool response;
+
+                try
+                {
+                    response = await this.usersServiceProxy.AddOrUpdateUserAsync(user, default(CancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    response = false;
+                }
+
+                if (!response)
+                {
+                    ModelState.AddModelError("", "There was an error during insert operation");
+                    return View(userInfo);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(userInfo);
         }
 
         // GET: Users/Edit/5

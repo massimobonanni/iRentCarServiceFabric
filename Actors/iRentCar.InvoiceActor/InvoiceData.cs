@@ -11,7 +11,7 @@ namespace iRentCar.InvoiceActor
         public string CallbackUri { get; set; }
 
         [DataMember]
-        public string Customer { get; set; }
+        public string CustomerId { get; set; }
 
         [DataMember]
         public DateTime CreationDate { get; set; }

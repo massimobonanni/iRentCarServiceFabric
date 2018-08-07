@@ -4,30 +4,30 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Dettagli Autoveicolo</h2>
+<h2>Vehicle Details</h2>
 
-<div>
+<div class="container">
     <dl class="dl-horizontal">
         <dt>
-            Targa
+            Plate
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Plate)
         </dd>
         <dt>
-            Costruttore
+            Brand
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Brand)
         </dd>
         <dt>
-            Modello
+            Model
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Model)
         </dd>
         <dt>
-            Costo Giornaliero (€)
+            Daily cost (€)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.DailyCost)
@@ -39,41 +39,42 @@
             @switch (Model.State)
             {
                 case iRentCar.VehicleActor.Interfaces.VehicleState.Busy:
-                    @: Prenotata
+                    @: Rented
                     break;
                 case iRentCar.VehicleActor.Interfaces.VehicleState.Free:
-                    @: Disponibile
+                    @: Available
                     break;
                 case iRentCar.VehicleActor.Interfaces.VehicleState.NotAvailable:
-                    @: Non Utilizzabile
+                    @: Not Available
                     break;
             }
         </dd>
     </dl>
+    <br/>
     @{
         var rentHidden = Model.CurrentRent == null ? "hidden" : "";
     }
     <div class="panel panel-default @rentHidden">
-        <div class="panel-heading">Noleggio</div>
+        <div class="panel-heading">Rent data</div>
         <div class="panel-body">
             <dl class="dl-horizontal">
                 <dt>
-                    Nome Utente
+                    Customer
                 </dt>
                 <dd>
                     @Html.DisplayFor(model => model.CurrentRent.User)
                 </dd>
                 <dt>
-                    Prenotata dal
+                    Start from
                 </dt>
                 <dd>
-                    @Model.CurrentRent.StartDate.ToString("dd/MM/yyyy hh:mm")
+                    @Model.CurrentRent?.StartDate.ToString("dd/MM/yyyy hh:mm")
                 </dd>
                 <dt>
-                    al
+                    to
                 </dt>
                 <dd>
-                    @Model.CurrentRent.EndDate.ToString("dd/MM/yyyy hh:mm")
+                    @Model.CurrentRent?.EndDate.ToString("dd/MM/yyyy hh:mm")
                 </dd>
             </dl>
         </div>

@@ -61,11 +61,11 @@ namespace iRentCar.InvoicesService.Interfaces
         }
 
 
-        public async Task<InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount,
-            DateTime releaseDate, CancellationToken cancellationToken)
+        public async Task<InvoiceInfo> GenerateInvoiceAsync(string customerId, decimal amount,
+            DateTime releaseDate, string callbackUri, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(customer))
-                throw new ArgumentException(nameof(customer));
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentException(nameof(customerId));
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
@@ -74,7 +74,7 @@ namespace iRentCar.InvoicesService.Interfaces
             try
             {
                 var proxy = CreateServiceProxy();
-                invoice = await proxy.GenerateInvoiceAsync(customer, amount, releaseDate, cancellationToken);
+                invoice = await proxy.GenerateInvoiceAsync(customerId, amount, releaseDate, callbackUri,cancellationToken);
             }
             catch (Exception ex)
             {

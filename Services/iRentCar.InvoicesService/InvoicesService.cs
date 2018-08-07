@@ -56,7 +56,7 @@ namespace iRentCar.InvoicesService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             await InitializeInvoiceNumbersDictionaryAsync();
-            
+
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -72,11 +72,11 @@ namespace iRentCar.InvoicesService
         }
 
         #region [ IInvoicesService interface ]
-        public async Task<Interfaces.InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount,
-            DateTime releaseDate, CancellationToken cancellationToken)
+        public async Task<Interfaces.InvoiceInfo> GenerateInvoiceAsync(string customerId, decimal amount,
+            DateTime releaseDate, string callbackUri, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(customer))
-                throw new ArgumentException(nameof(customer));
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentException(nameof(customerId));
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
@@ -100,15 +100,15 @@ namespace iRentCar.InvoicesService
                 var invoiceActor = this.actorFactory.Create<IInvoiceActor>(new ActorId(invoiceNumberComplete),
                     new Uri(UriConstants.InvoiceActorUri));
 
-                var creationResult = await invoiceActor.CreateAsync(customer, amount, releaseDate,
-                    UriConstants.UserActorUri, cancellationToken);
+                var creationResult = await invoiceActor.CreateAsync(customerId, amount, releaseDate,
+                    callbackUri, cancellationToken);
 
                 if (creationResult == InvoiceActorError.Ok)
                 {
                     invoice = new Interfaces.InvoiceInfo()
                     {
                         Amount = amount,
-                        Customer = customer,
+                        Customer = customerId,
                         InvoiceNumber = invoiceNumberComplete,
                         ReleaseDate = releaseDate,
                         State = Interfaces.InvoiceState.NotPaid

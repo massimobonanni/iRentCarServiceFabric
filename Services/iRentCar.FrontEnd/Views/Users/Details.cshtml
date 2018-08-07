@@ -1,0 +1,131 @@
+﻿@using iRentCar.FrontEnd.Models.Dto
+@model iRentCar.FrontEnd.Models.Dto.UserInfoForDetails
+
+@{
+    ViewData["Title"] = "User details";
+}
+@{
+    var currentRentHidden = Model.UserInfo.CurrentRent == null ? "disabled" : "";
+    var hrefRent = Model.UserInfo.CurrentRent == null ? "" : "#rent";
+    var invoicesHidden = Model.UserInfo.Invoices == null || !Model.UserInfo.Invoices.Any() ? "disabled" : "";
+    var hrefInvoices = Model.UserInfo.Invoices == null || !Model.UserInfo.Invoices.Any() ? "" : "#invoices";
+}
+
+<h2>User details</h2>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#info" data-toggle="tab">Info</a>
+        </li>
+        <li class="@currentRentHidden">
+            <a href="@hrefRent" data-toggle="tab">Current Rent</a>
+        </li>
+        <li class="@invoicesHidden">
+            <a href="@hrefInvoices" data-toggle="tab">Invoices</a>
+        </li>
+    </ul>
+    <br/>
+    <div class="tab-content ">
+        <div class="tab-pane active" id="info">
+            <dl class="dl-horizontal">
+                <dt>
+                    Username
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Username)
+                </dd>
+                <dt>
+                    Name
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserInfo.FirstName)&nbsp;@Html.DisplayFor(model => model.UserInfo.LastName)
+                </dd>
+                <dt>
+                    Email
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserInfo.Email)
+                </dd>
+                <dt>
+
+                </dt>
+                <dd>
+                    @if (Model.UserInfo.IsEnabled)
+                    {
+                        @:Enabled
+                    }
+                    else
+                    {
+                        @:Disabled
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="tab-pane" id="rent">
+            <dl class="dl-horizontal">
+                <dt>
+                    Plate
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserInfo.CurrentRent.Plate)
+                </dd>
+                <dt>
+                    Start from
+                </dt>
+                <dd>
+                    @Model.UserInfo.CurrentRent?.StartRent.ToString("dd/MM/yyyy hh:mm")
+                </dd>
+                <dt>
+                    to
+                </dt>
+                <dd>
+                    @Model.UserInfo.CurrentRent?.EndRent.ToString("dd/MM/yyyy hh:mm")
+                </dd>
+                <dt>
+                    Daily cost (€)
+                </dt>
+                <dd>
+                    @Model.UserInfo.CurrentRent?.DailyCost.ToString("##0.00")
+                </dd>
+            </dl>
+        </div>
+        <div class="tab-pane" id="invoices">
+            <table class="table table-striped ">
+                <thead>
+                    <tr>
+                        <th>
+                            Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Amount (€)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.UserInfo.Invoices)
+                    {
+                        <tr>
+                            <td>
+                                @item.Number
+                            </td>
+                            <td>
+                                @item.ReleaseDate.ToString("dd/MM/yyyy")
+                            </td>
+                            <td>
+                                @item.Amount.ToString("##0.00")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<br />
+<div>
+    @Html.ActionLink("Edit", "Edit", new { username = Model.Username }) |
+    <a asp-action="Index">Back to List</a>
+</div>

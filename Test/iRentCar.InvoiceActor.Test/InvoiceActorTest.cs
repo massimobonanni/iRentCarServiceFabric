@@ -51,7 +51,7 @@ namespace iRentCar.InvoiceActor.Test
             Assert.AreEqual(actual, Interfaces.InvoiceActorError.Ok);
             var invoiceData = await stateManager.GetStateAsync<InvoiceData>(InvoiceActor.InvoiceDataKeyName);
             Assert.IsNotNull(invoiceData);
-            Assert.AreEqual(invoiceData.Customer, customer);
+            Assert.AreEqual(invoiceData.CustomerId, customer);
             Assert.AreEqual(invoiceData.Amount, amount);
             Assert.AreEqual(invoiceData.CreationDate, creationDate);
             Assert.IsFalse(invoiceData.PaymentDate.HasValue);

@@ -18,7 +18,7 @@ namespace iRentCar.InvoiceActor
             {
                 Amount = data.Amount,
                 CreationDate = data.CreationDate,
-                Customer = data.Customer,
+                Customer = data.CustomerId,
                 PaymentDate = data.PaymentDate,
                 State = data.State
             };

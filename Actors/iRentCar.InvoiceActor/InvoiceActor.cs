@@ -63,10 +63,10 @@ namespace iRentCar.InvoiceActor
         #endregion [ StateManager accessors ]
 
         #region [ IInvoiceActor interfaces ]
-        public async Task<InvoiceActorError> CreateAsync(string customer, decimal amount, DateTime creationDate, string callbackUri, CancellationToken cancellationToken)
+        public async Task<InvoiceActorError> CreateAsync(string customerId, decimal amount, DateTime creationDate, string callbackUri, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(customer))
-                throw new ArgumentException(nameof(customer));
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentException(nameof(customerId));
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
@@ -79,7 +79,7 @@ namespace iRentCar.InvoiceActor
             {
                 Amount = amount,
                 CreationDate = creationDate,
-                Customer = customer,
+                CustomerId = customerId,
                 State = InvoiceState.NotPaid,
                 CallbackUri = callbackUri
             };
@@ -117,7 +117,7 @@ namespace iRentCar.InvoiceActor
             {
                 try
                 {
-                    var callbackProxy = this.actorFactory.Create<IInvoiceCallbackActor>(new ActorId(invoiceData.Customer),
+                    var callbackProxy = this.actorFactory.Create<IInvoiceCallbackActor>(new ActorId(invoiceData.CustomerId),
                             new Uri(invoiceData.CallbackUri));
 
                     await callbackProxy.InvoicePaidAsync(this.Id.ToString(), payDate, cancellationToken);

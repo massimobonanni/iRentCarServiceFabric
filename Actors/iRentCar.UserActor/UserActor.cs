@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using iRentCar.UserActor.Interfaces;
 using System.Fabric.Health;
 using System.Fabric;
+using iRentCar.Core;
 using iRentCar.InvoiceActor.Interfaces;
 using iRentCar.MailService.Interfaces;
 using iRentCar.UsersService.Interfaces;
@@ -89,10 +90,21 @@ namespace iRentCar.UserActor
 
         private const string CurrentRentedCarKeyName = "CurrentRentedCar";
         private const string InvoikeKeyNamePrefix = "Invoice_";
-        private const string CurrentInvoikeKeyName = "CurrentInvoice";
+        private const string CurrentInvoiceKeyName = "CurrentInvoice";
         private const string UserDataKeyName = "UserData";
+        private const string MailSendedKeyName = "MailSended";
 
         #region [ StateManager accessor ]
+        private async Task<bool> GetMailSendedFlagFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var infoData = await this.StateManager.TryGetStateAsync<bool>(MailSendedKeyName, cancellationToken);
+            return infoData.HasValue && infoData.Value;
+        }
+        private Task SetMailSendedIntoStateAsync(bool mailSended, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.StateManager.SetStateAsync<bool>(MailSendedKeyName, mailSended, cancellationToken);
+        }
+
         private async Task<UserData> GetUserDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var infoData = await this.StateManager.TryGetStateAsync<UserData>(UserDataKeyName, cancellationToken);
@@ -115,12 +127,12 @@ namespace iRentCar.UserActor
 
         private async Task<InvoiceData> GetInvoiceDataFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var data = await this.StateManager.TryGetStateAsync<InvoiceData>(CurrentInvoikeKeyName, cancellationToken);
+            var data = await this.StateManager.TryGetStateAsync<InvoiceData>(CurrentInvoiceKeyName, cancellationToken);
             return data.HasValue ? data.Value : null;
         }
         private Task SetInvoiceDataIntoStateAsync(InvoiceData data, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.StateManager.SetStateAsync<InvoiceData>(CurrentInvoikeKeyName, data, cancellationToken);
+            return this.StateManager.SetStateAsync<InvoiceData>(CurrentInvoiceKeyName, data, cancellationToken);
         }
 
         private string GenerateInvoiceKey(string invoiceNumber)
@@ -156,7 +168,7 @@ namespace iRentCar.UserActor
             return userData != null;
         }
 
-        private async Task SendReminderMail(CancellationToken cancellationToken=default(CancellationToken))
+        private async Task SendReminderMail(CancellationToken cancellationToken = default(CancellationToken))
         {
             var userInfo = await this.GetUserDataFromStateAsync(cancellationToken);
             if (userInfo != null && !string.IsNullOrWhiteSpace(userInfo.Email))
@@ -195,17 +207,26 @@ namespace iRentCar.UserActor
 
             UserActorError result = UserActorError.Ok;
 
-            var currentRentVehicle = await GetRentDataFromStateAsync(cancellationToken);
-
-            if (currentRentVehicle == null)
+            var currentInvoice = await this.GetInvoiceDataFromStateAsync(cancellationToken);
+            if (currentInvoice == null)
             {
-                currentRentVehicle = rentInfo.ToRentData();
-                await SetRentDataIntoStateAsync(currentRentVehicle, cancellationToken);
-                await this.RegisterReminderAsync(EndTimeExpiredReminderName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+                var currentRentVehicle = await GetRentDataFromStateAsync(cancellationToken);
+                if (currentRentVehicle == null)
+                {
+                    currentRentVehicle = rentInfo.ToRentData();
+                    await SetRentDataIntoStateAsync(currentRentVehicle, cancellationToken);
+                    await SetMailSendedIntoStateAsync(false, cancellationToken);
+                    var minutesForReminder = rentInfo.EndRent - DateTime.Now;
+                    await this.RegisterReminderAsync(EndTimeExpiredReminderName, null, minutesForReminder, TimeSpan.FromMinutes(1));
+                }
+                else
+                {
+                    result = UserActorError.VehicleAlreadyRented;
+                }
             }
             else
             {
-                result = UserActorError.VehicleAlreadyRented;
+                result = UserActorError.InvoiceNotPaid;
             }
 
             return result;
@@ -227,7 +248,7 @@ namespace iRentCar.UserActor
                 var amount = currentRentVehicle.CalculateCost(DateTime.Now);
 
                 var invoice = await this.invoicesServiceProxy.GenerateInvoiceAsync(this.Id.ToString(), amount.Value,
-                   DateTime.Now, cancellationToken);
+                   DateTime.Now, UriConstants.UserActorUri, cancellationToken);
 
                 var localInvoice = new InvoiceData()
                 {
@@ -312,8 +333,9 @@ namespace iRentCar.UserActor
                 var currentInvoice = await this.GetInvoiceDataFromStateAsync(cancellationToken);
                 if (currentInvoice.Number == invoiceNumber)
                 {
+                    currentInvoice.State = InvoiceState.Paid;
                     await this.AddOrUpdateInvoiceIntoStateAsync(currentInvoice, cancellationToken);
-                    await this.SetInvoiceDataIntoStateAsync(null,cancellationToken);
+                    await this.SetInvoiceDataIntoStateAsync(null, cancellationToken);
                 }
             }
         }
@@ -327,8 +349,10 @@ namespace iRentCar.UserActor
         {
             if (reminderName == EndTimeExpiredReminderName)
             {
+                var mailSended = await this.GetMailSendedFlagFromStateAsync();
                 var rentData = await this.GetRentDataFromStateAsync();
-                if (rentData != null)
+
+                if (!mailSended && rentData != null)
                 {
                     if (rentData.IsRentTimeExpired(DateTime.Now))
                     {
@@ -336,10 +360,8 @@ namespace iRentCar.UserActor
                         if (!string.IsNullOrWhiteSpace(userInfo.Email))
                         {
                             await SendReminderMail();
-
-                            var reminder = this.GetReminder(reminderName);
-                            await this.UnregisterReminderAsync(reminder);
                         }
+                        await this.SetMailSendedIntoStateAsync(true);
                     }
                 }
                 else

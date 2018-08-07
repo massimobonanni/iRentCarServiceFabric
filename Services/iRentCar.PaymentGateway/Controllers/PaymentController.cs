@@ -36,24 +36,39 @@ namespace iRentCar.PaymentGateway.Controllers
         {
             var body = await this.Request.GetRawBodyStringAsync();
 
-            try
-            {
-                var paymentData = await this.paymentAdapter.ParseAsync(body);
-                if (paymentData == null)
-                    return BadRequest();
-                if (paymentData.PaymentResult == PaymentResult.Paid)
-                {
-                    var invoiceProxy = this.actorFactory.Create<IInvoiceActor>(new ActorId(paymentData.InvoiceNumber),
-                        new Uri(UriConstants.InvoiceActorUri));
-                    await invoiceProxy.PaidAsync(paymentData.PaymentDate, default(CancellationToken));
-                }
-            }
-            catch (Exception)
-            {
+            var paymentData = await this.paymentAdapter.ParseAsync(body);
+            if (paymentData == null)
                 return BadRequest();
+
+            InvoiceActorError invoiceResponse = InvoiceActorError.GenericError;
+            if (paymentData.PaymentResult == PaymentResult.Paid)
+            {
+                var invoiceProxy = this.actorFactory.Create<IInvoiceActor>(new ActorId(paymentData.InvoiceNumber),
+                    new Uri(UriConstants.InvoiceActorUri));
+                try
+                {
+                    invoiceResponse = await invoiceProxy.PaidAsync(paymentData.PaymentDate, default(CancellationToken));
+                }
+                catch (Exception)
+                {
+                    return BadRequest();
+                }
+
+                switch (invoiceResponse)
+                {
+                    case InvoiceActorError.InvoiceAlreadyPaid:
+                        return Ok();
+                    case InvoiceActorError.InvoiceNotValid:
+                        return NotFound();
+                    case InvoiceActorError.PaymentDateNotCorrect:
+                        return BadRequest();
+                    case InvoiceActorError.GenericError:
+                        return BadRequest();
+                    case InvoiceActorError.Ok:
+                        return Ok();
+                }
+
             }
-
-
             return Ok();
         }
 

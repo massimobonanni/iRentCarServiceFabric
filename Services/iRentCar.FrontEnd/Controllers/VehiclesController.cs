@@ -75,6 +75,9 @@ namespace iRentCar.FrontEnd.Controllers
 
         public async Task<ActionResult> Reserve(string plate)
         {
+            if (string.IsNullOrWhiteSpace(plate))
+                return BadRequest();
+            
             var actorProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
                     new Uri(UriConstants.VehicleActorUri));
 
@@ -94,12 +97,12 @@ namespace iRentCar.FrontEnd.Controllers
         public async Task<ActionResult> Reserve(string plate, [FromForm] VehicleInfoForReserveDto reservation)
         {
             if (!ModelState.IsValid)
-                return View();
+                return View(reservation);
 
             if (reservation.StartReservation > reservation.EndReservation)
             {
-                ModelState.AddModelError("", "La data di inizio noleggio deve essere inferiore alla data di fine noleggio");
-                return View();
+                ModelState.AddModelError("", "The start reservation date must be less then the end reservation date.");
+                return View(reservation);
             }
 
             var vehicleProxy = this.actorFactory.Create<IVehicleActor>(new ActorId(plate),
@@ -112,8 +115,8 @@ namespace iRentCar.FrontEnd.Controllers
 
             if (vehicleInfo.State != VehicleState.Free)
             {
-                ModelState.AddModelError("", "L'autovettura non e' piu' disponibile per il noleggio.");
-                return View();
+                ModelState.AddModelError("", "The vehicle is not available.");
+                return View(reservation);
             }
 
 
@@ -128,21 +131,23 @@ namespace iRentCar.FrontEnd.Controllers
                 case VehicleActorError.Ok:
                     break;
                 case VehicleActorError.ReservationDatesWrong:
-                    ModelState.AddModelError("", "Le date di prenotazione sono errate");
+                    ModelState.AddModelError("", "The reservation dates are wrong");
                     break;
                 case VehicleActorError.VehicleBusy:
-                    ModelState.AddModelError("", "L'autovettura non può essere assegnata");
+                    ModelState.AddModelError("", "The vehicle cannot be reserved");
                     break;
                 case VehicleActorError.VehicleNotAvailable:
-                    ModelState.AddModelError("", "Il veicolo non è prenotabile");
+                    ModelState.AddModelError("", "The vehicle is not available");
+                    break;
+                case VehicleActorError.VehicleNotExists:
+                    ModelState.AddModelError("", "The vehicle doesn't exist");
                     break;
                 case VehicleActorError.GenericError:
-                    ModelState.AddModelError("", "Si è verificato un errore nella procedura di prenotazione");
-                    break;
                 default:
+                    ModelState.AddModelError("", "An error occurs during reservation procedure");
                     break;
             }
-            return View();
+            return View(reservation);
         }
 
 

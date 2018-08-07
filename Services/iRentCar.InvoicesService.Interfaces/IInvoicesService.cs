@@ -9,7 +9,7 @@ namespace iRentCar.InvoicesService.Interfaces
 {
     public interface IInvoicesService : IService
     {
-        Task<InvoiceInfo> GenerateInvoiceAsync(string customer, decimal amount, 
-            DateTime releaseDate, CancellationToken cancellationToken);
+        Task<InvoiceInfo> GenerateInvoiceAsync(string customerId, decimal amount,
+            DateTime releaseDate, string callbackUri, CancellationToken cancellationToken);
     }
 }
