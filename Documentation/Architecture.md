@@ -14,13 +14,13 @@ It is a Reliable Actor who has the responsibility to manage the status of a sing
 ### [UserActor](UserActor.md)
 It is a Reliable Actor who has the responsibility to manage the status of a user registered in the platform. It stores all the user data, the current rent data and all the invoices that the user had.
 
-### InvoiceActor
+### [InvoiceActor](InvoiceActor.md)
 It is a Reliable Actor who has the responsibility to manage a single invoice for the platform. It stores the invoice's data and its state.
 
-### VehiclesService
+### [VehiclesService](VehiclesService.md)
 It is a Reliable Stateful Service that exposes search features over the vehicles of the platform. VehicleActor uses this service to check if it is a valid vehicle or not and interacts with it to update its status.
 
-### UsersService
+### <a href="UsersService.md" target="_blank">UsersService</a>
 It is a Reliable Stateful Service that exposes search features over the users of the platform. UserActor uses this service to check if it is a valid user or not.
 
 ### InvoicesService
