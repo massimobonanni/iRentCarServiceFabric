@@ -125,6 +125,8 @@ namespace iRentCar.InvoiceActor
                 catch { }
             }
 
+            await SetInvoiceDataIntoStateAsync(new InvoiceData(invoiceData), cancellationToken);
+
             return InvoiceActorError.Ok;
         }
 

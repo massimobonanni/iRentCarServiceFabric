@@ -29,19 +29,19 @@ namespace iRentCar.UsersService.Interfaces
 
             var inResult = true;
             if (!string.IsNullOrWhiteSpace(username))
-                if (info.Username != username)
+                if (!String.Equals(info.Username, username, StringComparison.CurrentCultureIgnoreCase))
                     inResult = false;
 
             if (!string.IsNullOrWhiteSpace(firstName) && inResult)
-                if (!info.FirstName.Contains(firstName))
+                if (!info.FirstName.ContainsIgnoreCase(firstName))
                     inResult = false;
 
             if (!string.IsNullOrWhiteSpace(lastName) && inResult)
-                if (!info.LastName.Contains(lastName))
+                if (!info.LastName.ContainsIgnoreCase(lastName))
                     inResult = false;
 
             if (!string.IsNullOrWhiteSpace(mail) && inResult)
-                if (!info.Email.Contains(mail))
+                if (!info.Email.ContainsIgnoreCase(mail))
                     inResult = false;
 
             return inResult;

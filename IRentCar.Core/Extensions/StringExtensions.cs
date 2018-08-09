@@ -43,7 +43,7 @@ namespace System
                 hash ^= value[i];
                 hash *= FnvPrime;
             }
-            
+
             return (long)hash;
         }
 
@@ -92,6 +92,16 @@ namespace System
                 return null;
             }
             return match.Groups[1].Value + domainName;
+        }
+
+        public static bool ContainsIgnoreCase(this string right, string value)
+        {
+            if (right == null)
+                throw new NullReferenceException(nameof(right));
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return right.ToLower().Contains(value.ToLower());
         }
     }
 }

@@ -46,15 +46,15 @@ namespace iRentCar.VehiclesService.Interfaces
 
             var inResult = true;
             if (!string.IsNullOrWhiteSpace(plate))
-                if (info.Plate != plate)
+                if (!String.Equals(info.Plate, plate, StringComparison.CurrentCultureIgnoreCase))
                     inResult = false;
 
             if (!string.IsNullOrWhiteSpace(model) && inResult)
-                if (info.Model != model)
+                if (!String.Equals(info.Model, model, StringComparison.CurrentCultureIgnoreCase))
                     inResult = false;
 
             if (!string.IsNullOrWhiteSpace(brand) && inResult)
-                if (info.Brand != brand)
+                if (!String.Equals(info.Brand, brand, StringComparison.CurrentCultureIgnoreCase))
                     inResult = false;
 
             if (state.HasValue && inResult)

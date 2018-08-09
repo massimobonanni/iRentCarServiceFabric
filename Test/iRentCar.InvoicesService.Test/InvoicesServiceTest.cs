@@ -56,7 +56,7 @@ namespace iRentCar.InvoicesService.Test
             decimal amount = 100M;
             DateTime releaseDate = DateTime.Now;
 
-            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate, default(CancellationToken));
+            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate,null, default(CancellationToken));
 
         }
 
@@ -73,7 +73,7 @@ namespace iRentCar.InvoicesService.Test
             decimal amount = -1M;
             DateTime releaseDate = DateTime.Now;
 
-            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate, default(CancellationToken));
+            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate,null, default(CancellationToken));
 
         }
 
@@ -102,7 +102,7 @@ namespace iRentCar.InvoicesService.Test
 
             var service = new InvoicesService(context, stateManager, actorFactory.Object, null);
 
-            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate, default(CancellationToken));
+            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate,null, default(CancellationToken));
 
             Assert.IsNull(actual);
             uint? newInvoiceNumber = await GetInvoiceNumberInDictionaryAsync(stateManager, yearKey);
@@ -134,7 +134,7 @@ namespace iRentCar.InvoicesService.Test
 
             var service = new InvoicesService(context, stateManager, actorFactory.Object, null);
 
-            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate, default(CancellationToken));
+            var actual = await service.GenerateInvoiceAsync(customer, amount, releaseDate,null, default(CancellationToken));
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(actual.Customer, customer);
