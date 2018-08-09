@@ -8,7 +8,7 @@ The following image describes the architectural view:
 ## Platform Components
 iRentCar consists of several microservices described in the following sections.
 
-### VehicleActor
+### [VehicleActor](VehicleActor.md)
 It is a Reliable Actor who has the responsibility to manage the status of a single vehicle. It stores all the vehicle data, its state (Available, NotAvailable and Busy) and the data of the user rents the vehicle.
 
 ### UserActor
