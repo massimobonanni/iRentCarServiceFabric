@@ -8,4 +8,7 @@ This is a simple implementation of a rent car solution based on Service Fabric.
 * [Architecture](Documentation%2FArchitecture.md)
 * [Scenarios](Documentation%2FScenarios.md)
 
+---
+
+* [Test Console](Test%2FTestConsole%2FReadMe.md)
 

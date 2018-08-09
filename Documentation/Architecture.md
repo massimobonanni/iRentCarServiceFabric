@@ -26,7 +26,7 @@ It is a Reliable Stateful Service that exposes search features over the users of
 ### [InvoicesService](InvoicesService.md)
 It is a Reliable Stateful Service who has the responsibility to manage the invoice numeration and generate the invoice actor instances in the right way. The UserActor uses this service when it has to create a new invoice in the release vehicle scenario. 
 
-### MailSender
+### [MailSender](MailSender.md)
 It is a Reliable Stateful Service that allows sending emails.
 
 ### FrontEnd
