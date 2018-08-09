@@ -3,7 +3,7 @@ iRentCar is a simple implementation of a rent car platform based on Service Fabr
 
 The following image describes the architectural view:
 
-![Architecture view](Documentation/Images/ArchitectureView.jpg)
+![Architecture view](Images/ArchitectureView.jpg)
 
 ## Platform Components
 iRentCar consists of several microservices described in the following sections.
