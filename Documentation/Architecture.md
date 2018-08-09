@@ -11,7 +11,7 @@ iRentCar consists of several microservices described in the following sections.
 ### [VehicleActor](VehicleActor.md)
 It is a Reliable Actor who has the responsibility to manage the status of a single vehicle. It stores all the vehicle data, its state (Available, NotAvailable and Busy) and the data of the user rents the vehicle.
 
-### UserActor
+### [UserActor](UserActor.md)
 It is a Reliable Actor who has the responsibility to manage the status of a user registered in the platform. It stores all the user data, the current rent data and all the invoices that the user had.
 
 ### InvoiceActor

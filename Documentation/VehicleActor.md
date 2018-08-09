@@ -10,6 +10,8 @@ The vehicle information are:
 
 The vehicle actor also stores the information about the current rent (username, reservation start date and reservation end date).
 
+The ActorId is the plate.
+
 ## Requiremnents
 It exposes a feature to reserve the vehicle. The feature accepts in input the user, the start date and the end date. A vehicle can be reserved if:
 * the vehicle is free; 
