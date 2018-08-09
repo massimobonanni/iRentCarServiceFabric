@@ -88,23 +88,29 @@ namespace iRentCar.InvoicesService
             string yearKey = releaseDate.Year.ToString();
             using (var tx = this.StateManager.CreateTransaction())
             {
-                invoiceNumber = await this.invoiceNumbersDictionary.GetOrAddAsync(tx,
-                    yearKey, 0, TimeSpan.FromSeconds(5), cancellationToken);
-                invoiceNumber++;
+                invoiceNumber = await this.invoiceNumbersDictionary.GetOrAddAsync(tx,yearKey, 0);
+                InvoiceActorError creationResult = InvoiceActorError.Ok;
+                string invoiceNumberComplete;
+                do
+                {
+                    invoiceNumber++;
 
-                await this.invoiceNumbersDictionary.SetAsync(tx, yearKey, invoiceNumber);
+                    invoiceNumberComplete = $"{yearKey}/{invoiceNumber}";
 
-                // TODO: creazione della fattura come attore e inizializzazione!!!
-                var invoiceNumberComplete = $"{yearKey}/{invoiceNumber}";
+                    var invoiceActor = this.actorFactory.Create<IInvoiceActor>(new ActorId(invoiceNumberComplete),
+                        new Uri(UriConstants.InvoiceActorUri));
 
-                var invoiceActor = this.actorFactory.Create<IInvoiceActor>(new ActorId(invoiceNumberComplete),
-                    new Uri(UriConstants.InvoiceActorUri));
+                    creationResult = await invoiceActor.CreateAsync(customerId, amount, releaseDate,
+                        callbackUri, cancellationToken);
 
-                var creationResult = await invoiceActor.CreateAsync(customerId, amount, releaseDate,
-                    callbackUri, cancellationToken);
+                } while ((creationResult == InvoiceActorError.InvoiceAlreadyExists ||
+                         creationResult == InvoiceActorError.InvoiceAlreadyPaid ||
+                         creationResult == InvoiceActorError.InvoiceNotValid) && ! cancellationToken.IsCancellationRequested\);
 
                 if (creationResult == InvoiceActorError.Ok)
                 {
+                    await this.invoiceNumbersDictionary.SetAsync(tx, yearKey, invoiceNumber);
+
                     invoice = new Interfaces.InvoiceInfo()
                     {
                         Amount = amount,
