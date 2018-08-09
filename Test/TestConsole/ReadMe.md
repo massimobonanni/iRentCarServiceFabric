@@ -16,7 +16,7 @@ The second signature allows you to run the specific command. In particular, you 
 
 The next figure shows you the result of the previous command:
 
-![](documentation/images/commandhelp.jpg)
+![](Documentation/Images/commandhelp.jpg)
 
 ## Command: SearchVehicles ##
 The command allows you to execute a search to find vehicles in the platform and returns a paged list of the vehicles.
