@@ -29,10 +29,10 @@ It is a Reliable Stateful Service who has the responsibility to manage the invoi
 ### [MailSender](MailSender.md)
 It is a Reliable Stateful Service that allows sending emails.
 
-### FrontEnd
+### [FrontEnd](FrontEnd.md)
 It is a Reliable Stateless Service that hosts the web application used to manage the platform.
 
-### PaymentService
+### [PaymentService](PaymentService.md)
 This component consists of two microservices: PaymentProxy and PaymentGateway.
 
 #### PaymentProxy
