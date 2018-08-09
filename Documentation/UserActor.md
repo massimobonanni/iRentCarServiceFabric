@@ -25,6 +25,6 @@ It exposes a feature to check if it is valid or not.
 
 It exposes a feature to retrieve the user information (include the invoice list).
 
-It exposes a feature to reserve a vehicle and a feature to release a vehicle.
+It exposes a feature to reserve a vehicle (see [reserve a vehicle](Scenario-ReserveVehicle.md)) and a feature to release a vehicle (see [release a vehicle](Scenario-ReleaseVehicle.md)).
 
 It exposes a feature to retrieve (if exists) the current invoice.

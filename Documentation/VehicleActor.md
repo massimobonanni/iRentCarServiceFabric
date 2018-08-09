@@ -13,13 +13,13 @@ The vehicle actor also stores the information about the current rent (username, 
 The ActorId is the plate.
 
 ## Requiremnents
-It exposes a feature to reserve the vehicle. The feature accepts in input the user, the start date and the end date. A vehicle can be reserved if:
+It exposes a feature to reserve the vehicle (see [reserve a vehicle](Scenario-ReserveVehicle.md)). The feature accepts in input the user, the start date and the end date. A vehicle can be reserved if:
 * the vehicle is free; 
 * the user is valid; 
 * the user hasn't another vehicle;
 * the user has paid all previous invoices.
 
-It exposes a feature to return the vehicle.
+It exposes a feature to return the vehicle (see [release a vehicle](Scenario-ReleaseVehicle.md)).
 
 It exposes a feature to retrieve the vehicle information.
 
