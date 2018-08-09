@@ -105,7 +105,7 @@ namespace iRentCar.InvoicesService
 
                 } while ((creationResult == InvoiceActorError.InvoiceAlreadyExists ||
                          creationResult == InvoiceActorError.InvoiceAlreadyPaid ||
-                         creationResult == InvoiceActorError.InvoiceNotValid) && ! cancellationToken.IsCancellationRequested\);
+                         creationResult == InvoiceActorError.InvoiceNotValid) && ! cancellationToken.IsCancellationRequested);
 
                 if (creationResult == InvoiceActorError.Ok)
                 {

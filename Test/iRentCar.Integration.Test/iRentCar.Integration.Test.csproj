@@ -1,34 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
 
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="Moq" Version="4.8.3" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.3.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.3.2" />
+    <PackageReference Include="ServiceFabric.Mocks" Version="3.3.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Actors\iRentCar.InvoiceActor.Interfaces\iRentCar.InvoiceActor.Interfaces.csproj" />
     <ProjectReference Include="..\..\Actors\iRentCar.UserActor.Interfaces\iRentCar.UserActor.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Actors\iRentCar.UserActor\iRentCar.UserActor.csproj" />
     <ProjectReference Include="..\..\Actors\iRentCar.VehicleActor.Interfaces\iRentCar.VehicleActor.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Actors\iRentCar.VehicleActor\iRentCar.VehicleActor.csproj" />
     <ProjectReference Include="..\..\iRentCar.Core\iRentCar.Core.csproj" />
-    <ProjectReference Include="..\..\Services\iRentCar.InvoicesService.Interfaces\iRentCar.InvoicesService.Interfaces.csproj" />
-    <ProjectReference Include="..\..\Services\iRentCar.MailService.Interfaces\iRentCar.MailService.Interfaces.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.UsersService.Interfaces\iRentCar.UsersService.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Services\iRentCar.UsersService\iRentCar.UsersService.csproj" />
     <ProjectReference Include="..\..\Services\iRentCar.VehiclesSerive.Interfaces\iRentCar.VehiclesService.Interfaces.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.NETCore.App" Version="2.0.7" />
+    <ProjectReference Include="..\..\Services\iRentCar.VehiclesService\iRentCar.VehiclesService.csproj" />
   </ItemGroup>
 
 </Project>

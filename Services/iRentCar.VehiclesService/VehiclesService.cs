@@ -96,9 +96,17 @@ namespace iRentCar.VehiclesService
 
             if (fillDictionary)
             {
-                var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
+                long partitionLowKey = long.MinValue;
+                long partitionHighKey=long.MaxValue;
+                if (this.Partition != null)
+                {
+                    var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
+                    partitionLowKey = partition.LowKey;
+                    partitionHighKey = partition.HighKey;
+                }
+                
                 var vehicles =
-                    await this.vehiclesRepository.GetAllVehiclesAsync(partition.LowKey, partition.HighKey,
+                    await this.vehiclesRepository.GetAllVehiclesAsync(partitionLowKey, partitionHighKey,
                         cancellationToken);
                 using (var trx = this.StateManager.CreateTransaction())
                 {
