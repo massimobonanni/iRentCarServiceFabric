@@ -10,5 +10,5 @@ This is a simple implementation of a rent car solution based on Service Fabric.
 
 ---
 
-* [Test Console](Test%2FTestConsole%2FReadMe.md)
+* [Test Console](Documentation%2FTestConsole.md)
 
