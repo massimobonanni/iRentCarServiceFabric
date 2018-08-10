@@ -39,8 +39,7 @@ namespace iRentCar.Integration.Test
             IUsersRepository usersRepository = null, IActorFactory actorFactory = null, IServiceFactory serviceFactory = null,
             bool invokeRunAsync = true)
         {
-            var context = MockStatefulServiceContextFactory.Create(MockCodePackageActivationContext.Default,
-                "UsersServiceType", new Uri(UriConstants.UsersServiceUri), Guid.NewGuid(), DateTime.Now.Ticks);
+            var context = MockStatefulServiceContextFactory.Default;
 
             if (stateManager == null)
                 stateManager = new MockReliableStateManager();

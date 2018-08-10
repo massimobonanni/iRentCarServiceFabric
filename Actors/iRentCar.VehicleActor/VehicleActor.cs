@@ -49,9 +49,9 @@ namespace iRentCar.VehicleActor
         private readonly IVehiclesServiceProxy vehiclesServiceProxy;
 
 
-        private const string InfoKeyName = "Info";
-        private const string StateKeyName = "State";
-        private const string CurrentRentInfoKeyName = "CurrentRent";
+        internal const string InfoKeyName = "Info";
+        internal const string StateKeyName = "State";
+        internal const string CurrentRentInfoKeyName = "CurrentRent";
 
         /// <summary>
         /// This method is called whenever an actor is activated.

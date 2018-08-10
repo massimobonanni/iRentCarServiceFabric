@@ -49,7 +49,7 @@ namespace iRentCar.VehiclesService
 
         private IReliableDictionary<string, VehicleInfo> vehiclesDictionary;
 
-        private const string VehiclesDictionaryKeyName = "VehiclesDictionaryKeyName";
+        internal const string VehiclesDictionaryKeyName = "VehiclesDictionaryKeyName";
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -96,14 +96,7 @@ namespace iRentCar.VehiclesService
 
             if (fillDictionary)
             {
-                long partitionLowKey = long.MinValue;
-                long partitionHighKey=long.MaxValue;
-                if (this.Partition != null)
-                {
-                    var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
-                    partitionLowKey = partition.LowKey;
-                    partitionHighKey = partition.HighKey;
-                }
+                this.Partition.GetPartitionRange(out var partitionLowKey, out var partitionHighKey);
                 
                 var vehicles =
                     await this.vehiclesRepository.GetAllVehiclesAsync(partitionLowKey, partitionHighKey,
@@ -119,7 +112,7 @@ namespace iRentCar.VehiclesService
                             Model = vehicleInfo.Model,
                             Plate = vehicleInfo.Plate,
                             State = VehicleState.Free
-                        }, TimeSpan.FromSeconds(4), cancellationToken);
+                        });
                     }
                     await trx.CommitAsync();
                 }

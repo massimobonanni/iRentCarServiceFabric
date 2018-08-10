@@ -106,10 +106,11 @@ namespace iRentCar.UsersService
 
             if (fillDictionary)
             {
-                var partition = (Int64RangePartitionInformation)this.Partition.PartitionInfo;
+                this.Partition.GetPartitionRange(out var partitionLowKey, out var partitionHighKey);
+
                 var users =
-                    await this.usersRepository.GetAllUsersAsync(partition.LowKey, partition.HighKey,
-                        cancellationToken);
+                    await this.usersRepository.GetAllUsersAsync(partitionLowKey, partitionHighKey, cancellationToken);
+
                 using (var trx = this.StateManager.CreateTransaction())
                 {
                     foreach (var userInfo in users)
@@ -120,8 +121,8 @@ namespace iRentCar.UsersService
                             Email = userInfo.Email,
                             FirstName = userInfo.FirstName,
                             LastName = userInfo.LastName,
-                            IsEnabled=userInfo.IsEnabled
-                        }, TimeSpan.FromSeconds(5), cancellationToken);
+                            IsEnabled = userInfo.IsEnabled
+                        });
                     }
                     await trx.CommitAsync();
                 }
@@ -139,7 +140,7 @@ namespace iRentCar.UsersService
             {
                 using (var tx = this.StateManager.CreateTransaction())
                 {
-                    await this.usersDictionary.SetAsync(tx, user.Username,user,
+                    await this.usersDictionary.SetAsync(tx, user.Username, user,
                         TimeSpan.FromSeconds(5), cancellationToken);
                     await tx.CommitAsync();
                     result = true;

@@ -88,11 +88,11 @@ namespace iRentCar.UserActor
             }
         }
 
-        private const string CurrentRentedCarKeyName = "CurrentRentedCar";
-        private const string InvoikeKeyNamePrefix = "Invoice_";
-        private const string CurrentInvoiceKeyName = "CurrentInvoice";
-        private const string UserDataKeyName = "UserData";
-        private const string MailSendedKeyName = "MailSended";
+        internal const string CurrentRentedCarKeyName = "CurrentRentedCar";
+        internal const string InvoikeKeyNamePrefix = "Invoice_";
+        internal const string CurrentInvoiceKeyName = "CurrentInvoice";
+        internal const string UserDataKeyName = "UserData";
+        internal const string MailSendedKeyName = "MailSended";
 
         #region [ StateManager accessor ]
         private async Task<bool> GetMailSendedFlagFromStateAsync(CancellationToken cancellationToken = default(CancellationToken))
