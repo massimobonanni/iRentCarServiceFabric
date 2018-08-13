@@ -2,10 +2,6 @@
 
 ----
 
-![](https://mabonann.visualstudio.com/iRentCar/_apis/build/status/MasterBuild?branch=master)
-
-----
-
 This is a simple implementation of a rent car solution based on Service Fabric.
 
 * [Requirements](Documentation%2FRequirements.md)
