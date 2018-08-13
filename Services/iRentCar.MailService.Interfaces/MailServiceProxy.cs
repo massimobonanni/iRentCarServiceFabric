@@ -79,7 +79,7 @@ namespace iRentCar.MailService.Interfaces
                 var proxy = CreateServiceProxy(mail);
                 return await proxy.SendMailAsync(mail, callback, cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

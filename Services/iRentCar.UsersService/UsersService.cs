@@ -78,7 +78,7 @@ namespace iRentCar.UsersService
             {
                 await LoadUsersDictionaryAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }

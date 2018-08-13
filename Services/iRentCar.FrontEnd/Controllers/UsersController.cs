@@ -78,7 +78,7 @@ namespace iRentCar.FrontEnd.Controllers
             {
                 userInfo = await userProxy.GetInfoAsync(default(CancellationToken));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500);
             }
@@ -126,7 +126,7 @@ namespace iRentCar.FrontEnd.Controllers
                 {
                     response = await this.usersServiceProxy.AddOrUpdateUserAsync(user, default(CancellationToken));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     response = false;
                 }

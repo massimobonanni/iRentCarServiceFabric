@@ -109,7 +109,7 @@ namespace iRentCar.MailService
                 if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
                     return MailAdapterResult.NotInfrastructuralError;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return MailAdapterResult.NotInfrastructuralError;
             }

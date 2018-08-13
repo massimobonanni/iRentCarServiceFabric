@@ -76,7 +76,7 @@ namespace iRentCar.InvoicesService.Interfaces
                 var proxy = CreateServiceProxy();
                 invoice = await proxy.GenerateInvoiceAsync(customerId, amount, releaseDate, callbackUri,cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
