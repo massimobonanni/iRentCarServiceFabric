@@ -10,6 +10,7 @@ This is a simple implementation of a rent car solution based on Service Fabric.
 * [Architecture](Documentation%2FArchitecture.md)
 * [Scenarios](Documentation%2FScenarios.md)
 
+<br/>
 
 * [Test Console](Documentation%2FTestConsole.md)
 
