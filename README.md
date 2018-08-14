@@ -1,6 +1,8 @@
 ![](Documentation/Images/iCarRental%20banner.png)
 
 ----
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+----
 
 This is a simple implementation of a rent car solution based on Service Fabric.
 
