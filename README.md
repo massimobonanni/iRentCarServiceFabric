@@ -5,6 +5,7 @@
 ----
 
 This is a simple implementation of a rent car solution based on Service Fabric.
+iRentCar is not a ready-for-production platform but its purpose is to explain basic topics about Service Fabric and its SDK.
 
 * [Requirements](Documentation%2FRequirements.md)
 * [Architecture](Documentation%2FArchitecture.md)
