@@ -2,6 +2,7 @@
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Build status](https://mabonann.visualstudio.com/iRentCar/_apis/build/status/MasterBuild)](https://mabonann.visualstudio.com/iRentCar/_build/latest?definitionId=4)
 ----
 
 This is a simple implementation of a rent car solution based on Service Fabric.
