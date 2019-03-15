@@ -1,4 +1,4 @@
-﻿using Polly;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Fabric.Health;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 
 namespace Microsoft.ServiceFabric.Actors.Runtime
 {

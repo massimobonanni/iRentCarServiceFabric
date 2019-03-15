@@ -134,13 +134,18 @@ namespace iRentCar.VehicleActor
             var actorProxy = this.actorFactory.Create<IUserActor>(new ActorId(user),
                 new Uri(UriConstants.UserActorUri));
 
-            var response = await actorProxy.RentVehicleAsync(new UserActorInterfaces.RentInfo()
+            var rentinfo = new UserActorInterfaces.RentInfo()
             {
                 DailyCost = info.DailyCost,
                 Plate = this.Id.ToString(),
                 StartRent = startReservation,
                 EndRent = endReservation
-            }, cancellationToken);
+            };
+
+            //var response = await actorProxy.RentVehicleAsync(rentinfo, cancellationToken);
+
+            var response = await actorProxy.CallWithPolicyForTimeoutAsync<IUserActor, UserActorError>(c => actorProxy.RentVehicleAsync(rentinfo, c),
+                5, i => TimeSpan.FromMilliseconds(100 * i), cancellationToken);
 
             if (response == UserActorError.UserNotValid)
                 return VehicleActorError.UserNotValid;

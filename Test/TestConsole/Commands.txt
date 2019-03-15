@@ -1,4 +1,4 @@
-﻿dotnet testconsole.dll unreserve -plate=AM231PH 
+﻿dotnet testconsole.dll unreserve -plate=AA020TZ 
 
 dotnet testconsole.dll userInfo -user="Gus.Bergnaum"
 

@@ -46,7 +46,7 @@ namespace iRentCar.Core.Implementations
         private static void CreateVehiclesList()
         {
             vehicles = new List<VehicleInfo>();
-            for (var i = 0; i < 10000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 var brand = brands.ElementAt(RndGenerator.Next(brands.Count));
                 var model = brand.Item2.ElementAt(RndGenerator.Next(brand.Item2.Count));
@@ -70,7 +70,7 @@ namespace iRentCar.Core.Implementations
         private static string AlphaRandom(int numChar)
         {
             string alphaRandom = null;
-            for (var i = 0; i < numChar; i++)
+            for (int i = 0; i < numChar; i++)
             {
                 alphaRandom += UppercaseLetters.Substring(RndGenerator.Next(UppercaseLetters.Length), 1);
             }
@@ -81,7 +81,7 @@ namespace iRentCar.Core.Implementations
         private static string NumericRandom(int numChar)
         {
             string alphaRandom = null;
-            for (var i = 0; i < numChar; i++)
+            for (int i = 0; i < numChar; i++)
             {
                 alphaRandom += Numbers.Substring(RndGenerator.Next(Numbers.Length), 1);
             }
