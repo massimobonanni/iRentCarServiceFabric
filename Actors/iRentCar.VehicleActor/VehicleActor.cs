@@ -142,12 +142,15 @@ namespace iRentCar.VehicleActor
                 EndRent = endReservation
             }, cancellationToken);
 
+            if (response == UserActorError.UserNotValid)
+                return VehicleActorError.UserNotValid;
+
             if (response != UserActorError.Ok)
                 return VehicleActorError.GenericError;
 
             VehicleActorInterface.RentInfo rentInfo = new VehicleActorInterface.RentInfo() { User = user, StartDate = startReservation, EndDate = endReservation };
             await this.SetCurrentRentInfoIntoStateAsync(rentInfo, cancellationToken);
-            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Busy,cancellationToken);
+            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Busy, cancellationToken);
             var result = await this.vehiclesServiceProxy.UpdateVehicleStateAsync(this.Id.ToString(),
                 VehiclesService.Interfaces.VehicleState.Busy, cancellationToken);
 
@@ -176,7 +179,7 @@ namespace iRentCar.VehicleActor
                 return VehicleActorError.GenericError;
 
             await this.SetCurrentRentInfoIntoStateAsync(null, cancellationToken);
-            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Free,cancellationToken);
+            await this.SetVehicleStateIntoStateAsync(VehicleActorInterface.VehicleState.Free, cancellationToken);
             var result = await this.vehiclesServiceProxy.UpdateVehicleStateAsync(this.Id.ToString(),
                 VehiclesService.Interfaces.VehicleState.Free, cancellationToken);
 

@@ -18,6 +18,8 @@ namespace iRentCar.VehicleActor.Interfaces
         [EnumMember]
         VehicleNotExists =5,
         [EnumMember]
+        UserNotValid = 6,
+        [EnumMember]
         GenericError = 999
        
     }

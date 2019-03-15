@@ -66,25 +66,9 @@ namespace iRentCar.UserActor
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
             var userData = await GetUserDataFromStateAsync();
-
             if (userData == null)
             {
-                var user = await this.usersServiceProxy.GetUserByUserNameAsync(this.Id.ToString(), default(CancellationToken));
-                if (user != null)
-                {
-                    userData = new UserData()
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        IsEnabled = user.IsEnabled
-                    };
-                    await SetUserDataIntoStateAsync(userData);
-                }
-                else
-                {
-                    this.ReportHealthForUserUnknown();
-                }
+                await UpdateUserDataAsync();
             }
         }
 
@@ -160,11 +144,38 @@ namespace iRentCar.UserActor
         #endregion [ StateManager accessor ]
 
         #region [ Internal methods ]
+
+        private async Task<UserData> UpdateUserDataAsync()
+        {
+            UserData userData = null;
+            var user = await this.usersServiceProxy.GetUserByUserNameAsync(this.Id.ToString(), default(CancellationToken));
+            if (user != null)
+            {
+                userData = new UserData()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    IsEnabled = user.IsEnabled
+                };
+                await SetUserDataIntoStateAsync(userData);
+            }
+            else
+            {
+                this.ReportHealthForUserUnknown();
+            }
+            return userData;
+        }
+
         private async Task<bool> IsValidInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var userData = await GetUserDataFromStateAsync(cancellationToken);
             if (userData == null)
-                ReportHealthForUserUnknown();
+            {
+                userData = await UpdateUserDataAsync();
+                if (userData == null)
+                    ReportHealthForUserUnknown();
+            }
             return userData != null;
         }
 
