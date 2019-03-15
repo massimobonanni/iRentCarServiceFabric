@@ -211,7 +211,7 @@ namespace iRentCar.Integration.Test
 
             var response = await vehicleActor.ReserveAsync(user, startDate, endDate, default(CancellationToken));
 
-            Assert.AreEqual(response, VehicleActor.Interfaces.VehicleActorError.GenericError);
+            Assert.AreEqual(response, VehicleActor.Interfaces.VehicleActorError.UserNotValid);
 
             var vehicleData = await vehicleActor.StateManager.TryGetStateAsync<VehicleData>(VehicleActor.VehicleActor.InfoKeyName);
             Assert.IsTrue(vehicleData.HasValue);
