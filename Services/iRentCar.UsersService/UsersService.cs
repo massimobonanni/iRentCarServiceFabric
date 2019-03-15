@@ -135,7 +135,7 @@ namespace iRentCar.UsersService
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            bool result = false;
+            var result = false;
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
                 using (var tx = this.StateManager.CreateTransaction())

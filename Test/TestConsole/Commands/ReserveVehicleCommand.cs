@@ -19,7 +19,7 @@ namespace TestConsole.Commands
 
         public override Task<bool> ParseArgumentsAsync(IEnumerable<string> args)
         {
-            bool result = true;
+            var result = true;
             if (!GetValue<string>(args, "plate", ref plate))
             {
 
