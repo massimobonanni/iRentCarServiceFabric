@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.644" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="RestSharp" Version="106.3.1" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
   </ItemGroup>
 
   <ItemGroup>
